@@ -24,7 +24,7 @@ public class ActivityDetector {
 
 
         // model from activityModel
-        int ret = init(assetManager, "file:///android_asset/activityModel.pb");
+        int ret = init(assetManager, "file:///android_asset/activityModelMLP.pb");
 
         return ret >= 0;
     }
