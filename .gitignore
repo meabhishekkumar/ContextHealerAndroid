@@ -8,3 +8,5 @@
 /captures
 jni-build/libs/**
 jni-build/obj/**
+jni-build-x86/libs/**
+jni-build-x86/obj/**

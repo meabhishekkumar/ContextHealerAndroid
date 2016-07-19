@@ -67,7 +67,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //double inputs[] = {-1.566340,	-7.777218,	-9.112013 }; // Actual jogging
         //double inputs[] = {-2.533385,	6.088296,	3.023717 };  // Actual jogging
 
+        //currentActivity = getActivity(inputs);
 
+        //runOnUiThread(new Runnable() {
+        //    @Override
+        //    public void run() {
+        //        mResultText.setText("Output: " + currentActivity);
+        //    }
+        //});
 
         //TestAPICall();
         SetupTimerForAPICall(); //working on local emulator.. have to configure the API IP for actual machine
