@@ -11,6 +11,8 @@
 
 ### For JNI-Build
 
+- For ARM architecture
+
 Step 1: Add NDK_HOME to system Path
 
 
@@ -25,6 +27,25 @@ Step 2 :
 $ make
 $ make install
 ```
+
+
+- For x86 and x86_64 architecture
+
+Step 1: Add NDK_HOME to system Path
+
+
+```
+$ cd jni-build-x86
+$ export NDK_HOME="/Users/dev/Library/Android/ndk"
+$ export PATH=$PATH:$NDK_HOME
+```
+Step 2 :
+
+```
+$ make
+$ make install
+```
+
 
 3. Trained Model file
 
