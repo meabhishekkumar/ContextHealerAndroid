@@ -100,65 +100,6 @@ TENSORFLOW_METHOD(init)(JNIEnv* env,
 	return 0;
 }
 
-static int process(const int* pixels) {
-	// Create input tensor
-	Tensor input_tensor( tensorflow::DT_FLOAT,
-						 tensorflow::TensorShape( {1, PIXEL_SIZE} ) );
-
-	auto input_tensor_mapped = input_tensor.tensor<float, 2>();
-	
-	for(int i= 0; i<PIXEL_SIZE; ++i) {
-		int pixel = pixels[i];
-		if( pixel >= 0xff ) {
-			pixel = 0xff;
-		} else if( pixel < 0 ) {
-			pixel = 0;
-		}
-		float value = (float)pixel / 255.0f;
-		input_tensor_mapped(0, i) = value;
-	}
-	
-	LOG(INFO) << "Start computing.";
-
-	std::vector<std::pair<std::string, tensorflow::Tensor> > input_tensors(
-		{{"input", input_tensor}});
-
-	// Actually run the image through the model.
-	std::vector<Tensor> output_tensors;
-	std::vector<std::string> output_names({"output"});
-
-	Status run_status = session->Run( input_tensors, output_names,
-									  {},
-									  &output_tensors );
-	
-	LOG(INFO) << "End computing.";
-	
-	if (!run_status.ok()) {
-		LOG(ERROR) << "Error during inference: " << run_status;
-		return -1;
-	}
-	
-	// Find best score digit
-	Tensor& output_tensor = output_tensors[0];
-	tensorflow::TTypes<float>::Flat output_flat = output_tensor.flat<float>();
-	
-	float max_score = std::numeric_limits<float>::min();
-	int maxIndex = -1;
-	
-	for(int i=0; i<10; ++i) {
-		const float score = output_flat(i);
-		if( score > max_score ) {
-			maxIndex = i;
-			max_score = score;
-		}
-		
-		VLOG(0) <<  " (" << i << "): " << score;
-	}
-	
-	return maxIndex;
-}
-
-
 static double makePredictions(const double* inputs) {
 	// Create input tensor
 	Tensor input_tensor( tensorflow::DT_FLOAT,
@@ -198,15 +139,18 @@ static double makePredictions(const double* inputs) {
 }
 
 
-static int makePredictionForAcivityClass(const double* inputs) {
+static int makePredictionForAcivityClass(int featurescount, const double* inputs) {
+    LOG(INFO) << "x86 Architecture";
+    LOG(INFO) << "features count : "<< featurescount;
 	// Create input tensor
 	Tensor input_tensor( tensorflow::DT_FLOAT,
-						 tensorflow::TensorShape( {1,3} ) );
+						 tensorflow::TensorShape( {1,featurescount} ) );
 
 	auto input_tensor_mapped = input_tensor.tensor<float, 2>();
-    input_tensor_mapped(0,0) = inputs[0];
-    input_tensor_mapped(0,1) = inputs[1];
-    input_tensor_mapped(0,2) = inputs[2];
+    for(int i=0; i<featurescount; i++) {
+       		input_tensor_mapped(0,i) = inputs[i];
+       	}
+
 
 	LOG(INFO) << "Start computing.";
 
@@ -252,12 +196,12 @@ static int makePredictionForAcivityClass(const double* inputs) {
 
 
 JNIEXPORT jint JNICALL
-TENSORFLOW_METHOD(getActivityClass)(JNIEnv* env, jobject thiz, jdoubleArray inputs) {
+TENSORFLOW_METHOD(getActivityClass)(JNIEnv* env, jobject thiz,jint featurescount, jdoubleArray inputs) {
 
 
     jboolean iCopied = JNI_FALSE;
     jdouble* processed = env->GetDoubleArrayElements(inputs, &iCopied);
-    int result = makePredictionForAcivityClass( reinterpret_cast<double*>(processed) );
+    int result = makePredictionForAcivityClass(featurescount,  reinterpret_cast<double*>(processed) );
 
 
     return (jint)result;

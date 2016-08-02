@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
 
+import java.io.File;
+
 public class ActivityDetector {
     static {
         System.loadLibrary("tensorflow_context");
@@ -15,7 +17,7 @@ public class ActivityDetector {
      * draw pixels
      */
 
-    public native int getActivityClass(double[] inputs);
+    public native int getActivityClass(int featurescount, double[] inputs);
     public native double getTestPrediction(double[] inputs);
 
     public boolean setup(Context context) {
@@ -24,7 +26,8 @@ public class ActivityDetector {
 
 
         // model from activityModel
-        int ret = init(assetManager, "file:///android_asset/activityModelMLP.pb");
+        int ret = init(assetManager, "file:///android_asset/activityModelMLP2.pb");
+        //int ret = init(assetManager, "file:///android_asset/activityModelLR.pb");
 
         return ret >= 0;
     }

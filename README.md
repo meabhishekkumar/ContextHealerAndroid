@@ -54,3 +54,4 @@ Put the tensorflow model file (*.pb file) in **app/src/main/assets** folder.
 
 
 
+

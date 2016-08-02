@@ -36,7 +36,7 @@ TENSORFLOW_METHOD(init)(
 
 JNIEXPORT jint JNICALL
 TENSORFLOW_METHOD(getActivityClass)(
-    JNIEnv* env, jobject thiz, jdoubleArray input);
+    JNIEnv* env, jobject thiz, jint featurescount, jdoubleArray input);
 
 JNIEXPORT jdouble JNICALL
 TENSORFLOW_METHOD(getTestPrediction)(
