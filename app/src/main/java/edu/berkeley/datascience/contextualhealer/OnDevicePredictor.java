@@ -6,7 +6,7 @@ public class OnDevicePredictor implements IPredictor {
     public ActivityType GetActivity(ActivityDetector detector, double[] sample) {
         int result = detector.getActivityClass(sample.length, sample);
         ActivityType activity;
-
+        
         switch (result) {
             case 1:  activity = ActivityType.downstairs;
                 break;
