@@ -11,6 +11,8 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
+import edu.berkeley.datascience.contextualhealer.activity.ActivityDetector;
+
 import static junit.framework.TestCase.assertEquals;
 
 @RunWith(RobolectricTestRunner.class)

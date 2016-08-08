@@ -1,13 +1,12 @@
 package edu.berkeley.datascience.contextualhealer;
 
 
-import android.test.InstrumentationTestCase;
-import android.test.mock.MockContext;
 import android.test.suitebuilder.annotation.LargeTest;
-import android.content.Context;
 
 import org.apache.commons.math3.stat.StatUtils;
 import org.junit.Test;
+
+import edu.berkeley.datascience.contextualhealer.model.PredictionSample;
 
 import static org.junit.Assert.assertEquals;
 

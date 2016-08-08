@@ -1,4 +1,6 @@
-package edu.berkeley.datascience.contextualhealer;
+package edu.berkeley.datascience.contextualhealer.activity;
+
+import edu.berkeley.datascience.contextualhealer.interfaces.IPredictor;
 
 public class OnDevicePredictor implements IPredictor {
 

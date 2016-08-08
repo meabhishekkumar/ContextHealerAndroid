@@ -1,4 +1,4 @@
-package edu.berkeley.datascience.contextualhealer;
+package edu.berkeley.datascience.contextualhealer.activity;
 
 public enum ActivityType {
     downstairs,
