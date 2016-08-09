@@ -6,6 +6,7 @@ import android.hardware.SensorManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -27,6 +28,7 @@ import java.util.TimerTask;
 import edu.berkeley.datascience.contextualhealer.activity.ActivityDetector;
 import edu.berkeley.datascience.contextualhealer.activity.ActivityType;
 import edu.berkeley.datascience.contextualhealer.adapter.IconTabsAdapter;
+import edu.berkeley.datascience.contextualhealer.fragment.NavigationDrawerFragment;
 import edu.berkeley.datascience.contextualhealer.fragment.fragmentActiveGoals;
 import edu.berkeley.datascience.contextualhealer.fragment.fragmentActivityReport;
 import edu.berkeley.datascience.contextualhealer.fragment.fragmentActivityTrend;
@@ -94,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
         setTabIcons(); // Set the icons to the Tabs
 
-
+        setUpNavigationDrawer();
 
 
         //Sensor manager setup
@@ -105,6 +107,13 @@ public class MainActivity extends AppCompatActivity {
 //        mSensorManager.registerListener(this, mAccelerometer , SensorManager.SENSOR_DELAY_NORMAL);
 
 
+    }
+
+    //Navigation Drawer
+    private void setUpNavigationDrawer(){
+        NavigationDrawerFragment drawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.nav_drwr_fragment);
+        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerFragment.setUpDrawer(R.id.nav_drwr_fragment, drawerLayout, toolbar);
     }
 
     // Initialise Activity Data

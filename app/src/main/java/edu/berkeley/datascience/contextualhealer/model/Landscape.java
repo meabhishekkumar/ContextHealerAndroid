@@ -39,6 +39,7 @@ public class Landscape {
 
 		ArrayList<Landscape> dataList = new ArrayList<>();
 
+
 		int[] images = {
 				R.drawable.thumb_1_0, R.drawable.thumb_1_1, R.drawable.thumb_1_2, R.drawable.thumb_1_3,
 				R.drawable.thumb_1_4, R.drawable.thumb_1_5, R.drawable.thumb_1_6, R.drawable.thumb_1_7,

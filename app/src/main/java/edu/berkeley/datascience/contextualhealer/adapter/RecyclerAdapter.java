@@ -6,19 +6,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.List;
 
 import edu.berkeley.datascience.contextualhealer.R;
+import edu.berkeley.datascience.contextualhealer.model.ActiveGoal;
 import edu.berkeley.datascience.contextualhealer.model.Landscape;
 
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder> {
-	List<Landscape> mData;
+	List<ActiveGoal> mData;
 	private LayoutInflater inflater;
 
-	public RecyclerAdapter(Context context, List<Landscape> data) {
+	public RecyclerAdapter(Context context, List<ActiveGoal> data) {
 		inflater = LayoutInflater.from(context);
 		this.mData = data;
 	}
@@ -32,7 +34,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
 
 	@Override
 	public void onBindViewHolder(MyViewHolder holder, int position) {
-		Landscape current = mData.get(position);
+		ActiveGoal current = mData.get(position);
 		holder.setData(current, position);
 	}
 
@@ -43,23 +45,36 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
 
 	class MyViewHolder extends RecyclerView.ViewHolder {
 		TextView title;
+		TextView subTitle;
+		TextView description;
+		TextView progressBarDescription;
+		TextView timeInterval;
+		ProgressBar progressBar;
 		ImageView imgThumb, imgDelete, imgAdd;
 		int position;
-		Landscape current;
+		ActiveGoal current;
 
 		public MyViewHolder(View itemView) {
 			super(itemView);
 			title       = (TextView)  itemView.findViewById(R.id.tvTitle);
+			subTitle    = (TextView)  itemView.findViewById(R.id.tvSubTitle);
+			description = (TextView)  itemView.findViewById(R.id.tvDescription);
 			imgThumb    = (ImageView) itemView.findViewById(R.id.img_row);
-			imgDelete   = (ImageView) itemView.findViewById(R.id.img_row_delete);
-			imgAdd      = (ImageView) itemView.findViewById(R.id.img_row_add);
+			progressBar = (ProgressBar) itemView.findViewById(R.id.activegoalprogressBar);
+			progressBarDescription = (TextView) itemView.findViewById(R.id.tvProgressDescription);
+			timeInterval = (TextView) itemView.findViewById(R.id.tvTimeInterval);
 		}
 
-		public void setData(Landscape current, int position) {
+		public void setData(ActiveGoal current, int position) {
 			this.title.setText(current.getTitle());
+			this.subTitle.setText(current.getActivityType().toString());
+			this.description.setText(current.getDescription());
 			this.imgThumb.setImageResource(current.getImageID());
 			this.position = position;
 			this.current = current;
+			this.progressBar.setProgress(current.getCompletionPercentage());
+			this.timeInterval.setText(current.getTimeinterval());
+			this.progressBarDescription.setText(current.getCompletionPercentage() + " % Completed");
 		}
 	}
 }
