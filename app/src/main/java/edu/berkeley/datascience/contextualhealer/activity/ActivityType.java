@@ -7,5 +7,6 @@ public enum ActivityType {
     standing,
     upstairs,
     walking,
-    unknown
+    unknown,
+    staircase
 }

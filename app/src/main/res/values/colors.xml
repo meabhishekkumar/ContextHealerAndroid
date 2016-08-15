@@ -17,4 +17,22 @@
     <color name="grey_600">#757575</color>
     <color name="grey_700">#616161</color>
     <color name="grey_800">#424242</color>
+
+    <!-- Logo Color -->
+    <color name="logoMainColor">#87CFBD</color>
+    <color name="logoSecondaryColor">#4A4946</color>
+
+
+    <!-- Activity Color -->
+
+    <color name="color_activity_jogging">#FF6633CC</color>
+    <color name="color_activity_walking">#FF3399FF</color>
+    <color name="color_activity_standing">#FFFF9800</color>
+    <color name="color_activity_sitting">#FFFFEB3B</color>
+    <color name="color_activity_upstairs">#FFF44336</color>
+    <color name="color_activity_downstairs">#FFFF3366</color>
+    <color name="color_activity_unknown">#FF87CFBD</color>
+    <color name="color_activity_staircase">#FFF44336</color>
+
+
 </resources>

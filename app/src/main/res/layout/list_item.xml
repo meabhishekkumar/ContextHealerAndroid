@@ -82,13 +82,13 @@
 				android:textSize="15sp"
 				android:textStyle="bold"/>
 			<android.support.v7.widget.SwitchCompat
-				android:id="@+id/Switch"
+				android:id="@+id/tvIsCurrentlyTracked"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:background="@android:color/transparent"
 				android:button="@null"
 				android:padding="2dp"
-				android:checked="true"/>
+				android:checked="false"/>
 
 			<TextView
 				android:id="@+id/tvProgressDescription"

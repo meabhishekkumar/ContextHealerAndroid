@@ -1,0 +1,47 @@
+----------------------------------------------------------------------------
+Table: Goal
+----------------------------------------------------------------------------
+GoalID : int : AutoIncrement
+GoalTitle : Text : 200
+GoalType : Text : 100 : Running, Jogging, Walking ( fixed options)
+GoalDurationInMinutes : Int : Number of minutes the activity to be performed
+GoalDescription : Text : 400 : Summary of Goal : Jogging for 10 mins
+GoalDays : What are days we need to track : Format : MON,TUE,WED,THR
+GoalStartTime : Text : 24 hour format : 08:00
+GoalEndTime: Text : 24 Hour Format : 15:00
+IsGoalCurrentlyTracked : Int : 0 or 1 : 1 means true, 0 means false
+IsGoalDeleted : Int 0 or 1
+CompletedDurationInMinutes : int : Number of minutes already performed for the given block
+CompletedPercentage : int : PercentageOfCompletion
+
+
+
+----------------------------------------------------------------------------
+Table: GoalStatus
+----------------------------------------------------------------------------
+GoalID: int : FK to Goal Table
+GoalDurationInMinutes :
+
+
+----------------------------------------------------------------------------
+Table: RawSensorData
+----------------------------------------------------------------------------
+#DeviceID : long : Unique ID for one Device [DeviceID and TimeStamp form primary key]
+TimeStamp : long : TimeStamp
+Accelerometer_X : float
+Accelerometer_Y : float
+Accelerometer_Z : float
+
+----------------------------------------------------------------------------
+Table: ActivitySample
+----------------------------------------------------------------------------
+#DeviceID : long :
+StartTimeStamp : long
+EndTimeStamp : long
+SampleDurationInMilliSeconds : int
+PredictedActivity : Text
+
+
+
+
+

@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/rootLayout"
+                tools:context=".app.CreateGoalActivity">
+
+    <LinearLayout
+        android:id="@+id/buttons"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete"
+            android:id="@+id/btnDeleteGoal"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:elevation="2dp"
+            />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            android:id="@+id/btnSaveGoal"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:elevation="2dp"
+            />
+
+
+    </LinearLayout>
+
+    <include
+        android:id="@+id/createGoalToolBar"
+        layout="@layout/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"/>
+
+
+    <!--<android.support.v7.widget.Toolbar-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:id="@+id/view"-->
+    <!--android:layout_alignParentTop="true"-->
+    <!--android:layout_centerHorizontal="true"/>-->
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@id/buttons"
+        android:layout_below="@+id/createGoalToolBar"
+        android:background="@android:color/transparent">
+        <!--Scrollable content here-->
+
+        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+
+                     android:layout_marginTop="5dp">
+
+
+            <!-- Enable Tracking -->
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent">
+
+                <ImageView
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_track_changes_white_36dp"
+                    android:tint="@color/grey_500"
+                    android:layout_column="1"
+                    android:layout_marginTop="16dp"/>
+
+                <LinearLayout android:orientation="vertical"
+                              android:layout_column="2"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:layout_gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/enable_tracking"
+                        android:layout_gravity="center_horizontal"
+                        android:textAppearance="?android:attr/textAppearanceSmallPopupMenu"
+                        />
+
+
+
+                </LinearLayout>
+
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/tvIsTrackingEnabled"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:button="@null"
+
+                    android:padding="2dp"
+                    android:checked="true"
+                    android:layout_column="3"
+                    android:layout_gravity="center"/>
+
+            </TableRow>
+
+
+            <!-- Goal Title -->
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent">
+
+                <ImageView
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:src="@drawable/ic_edit_white_24dp"
+                    android:tint="@color/grey_500"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_column="1"
+                    android:layout_marginTop="16dp"/>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2">
+                    <EditText
+                        android:id="@+id/txtGoalTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/create_goal_title"
+                        />
+                </android.support.design.widget.TextInputLayout>
+            </TableRow>
+
+            <!-- Start Time -->
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <ImageView
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_access_alarm_white_36dp"
+                    android:tint="@color/grey_500"
+                    android:layout_column="1"
+                    android:layout_marginTop="16dp"/>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2">
+                    <EditText
+                        android:id="@+id/txtStartTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:width="100dp"
+                        android:hint="Start Time" android:text="00:00" android:clickable="true" android:inputType="time" />
+                </android.support.design.widget.TextInputLayout>
+
+
+
+            </TableRow>
+
+
+            <!-- End Time-->
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <ImageView
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_access_alarm_white_36dp"
+                    android:tint="@color/grey_500"
+                    android:layout_column="1"
+                    android:layout_marginTop="16dp"/>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2">
+                    <EditText
+                        android:id="@+id/txtEndTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:width="100dp"
+                        android:hint="End Time" android:text="00:00" android:clickable="true" android:inputType="time"
+                        />
+                </android.support.design.widget.TextInputLayout>
+            </TableRow>
+
+
+            <!-- Duration-->
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <ImageView
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_timer_white_36dp"
+                    android:tint="@color/grey_500"
+                    android:layout_column="1"
+                    android:layout_marginTop="16dp"/>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2">
+                    <EditText
+                        android:id="@+id/txtDurationInMinutes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:width="100dp"
+                        android:hint="Duration (mins)" android:text="60" android:clickable="true" android:inputType="number"
+                        />
+                </android.support.design.widget.TextInputLayout>
+            </TableRow>
+
+
+            <!-- Repeat information -->
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <ImageView
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_insert_invitation_white_36dp"
+                    android:tint="@color/grey_500"
+                    android:layout_column="1"
+                    android:layout_marginTop="16dp"/>
+
+                <LinearLayout android:orientation="vertical"
+                              android:layout_column="2"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content">
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_column="2">
+                        <EditText
+                            android:id="@+id/txtRepeatDays"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:hint="Repeat" android:clickable="true" android:inputType="time"
+                            android:width="100dp"/>
+                    </android.support.design.widget.TextInputLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtRepeatCustomRule"
+                        android:width="200dp"/>
+                </LinearLayout>
+
+            </TableRow>
+
+
+            <!--Activity Type -->
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <ImageView
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_directions_run_white_36dp"
+                    android:tint="@color/grey_500"
+                    android:layout_column="1"
+                    android:layout_marginTop="16dp"/>
+
+                <LinearLayout android:orientation="vertical"
+                              android:layout_column="2"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Activity Type"
+                        android:width="200dp"
+                        />
+
+                    <info.hoang8f.android.segmented.SegmentedGroup
+                        xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/selectActivityType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal"
+                        segmentedgroup:sc_border_width="2dp"
+                        segmentedgroup:sc_corner_radius="1dp"
+                        segmentedgroup:sc_tint_color="@color/colorAccent"
+                        >
+
+                        <RadioButton
+                            android:id="@+id/chkActivityJogging"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Jogging"
+                            style="@style/RadioButton"
+                            android:checked="true">
+
+                        </RadioButton>
+
+                        <RadioButton
+                            android:id="@+id/chkActivityWalking"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Walking"
+                            style="@style/RadioButton" />
+
+                        <RadioButton
+                            android:id="@+id/chkActivityStaircase"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Staircase"
+                            style="@style/RadioButton" />
+                    </info.hoang8f.android.segmented.SegmentedGroup>
+                </LinearLayout>
+
+            </TableRow>
+
+
+
+
+            <!-- Enable Notification -->
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent">
+
+                <ImageView
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_notifications_active_white_36dp"
+                    android:tint="@color/grey_500"
+                    android:layout_column="1"
+                    android:layout_marginTop="16dp"/>
+
+                <LinearLayout android:orientation="vertical"
+                              android:layout_column="2"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:layout_gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/enable_notification"
+                        android:layout_gravity="center_horizontal"
+                        android:textAppearance="?android:attr/textAppearanceSmallPopupMenu"
+                        />
+
+
+
+                </LinearLayout>
+
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/tvIsNotificationEnabled"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:button="@null"
+
+                    android:padding="2dp"
+                    android:checked="true"
+                    android:layout_column="3"
+                    android:layout_gravity="center"/>
+
+            </TableRow>
+
+            <!--&lt;!&ndash; Share to network &ndash;&gt;-->
+            <!--<TableRow-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="fill_parent">-->
+
+            <!--<ImageView-->
+            <!--android:layout_marginLeft="16dp"-->
+            <!--android:layout_marginRight="16dp"-->
+            <!--android:layout_width="36dp"-->
+            <!--android:layout_height="36dp"-->
+            <!--android:src="@drawable/ic_share_white_36dp"-->
+            <!--android:tint="@color/grey_500"-->
+            <!--android:layout_column="1"-->
+            <!--android:layout_marginTop="16dp"/>-->
+
+            <!--<LinearLayout android:orientation="vertical"-->
+            <!--android:layout_column="2"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center_vertical">-->
+
+            <!--<TextView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/enable_share"-->
+            <!--android:layout_gravity="center_horizontal"-->
+            <!--android:textAppearance="?android:attr/textAppearanceSmallPopupMenu"-->
+            <!--/>-->
+
+
+
+            <!--</LinearLayout>-->
+
+            <!--<android.support.v7.widget.SwitchCompat-->
+            <!--android:id="@+id/tvIsShareOnNetwork"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="@android:color/transparent"-->
+            <!--android:button="@null"-->
+
+            <!--android:padding="2dp"-->
+            <!--android:checked="false"-->
+            <!--android:layout_column="3"-->
+            <!--android:layout_gravity="center"/>-->
+
+            <!--</TableRow>-->
+
+
+            <!-- Share to network -->
+
+
+
+        </TableLayout>
+    </ScrollView>
+
+</RelativeLayout>

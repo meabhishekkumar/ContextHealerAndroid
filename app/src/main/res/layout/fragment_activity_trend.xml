@@ -2,15 +2,159 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@android:color/holo_red_dark">
+                xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
+
+
+    <!--<org.eazegraph.lib.charts.PieChart-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/pieChartActivitySummary"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_centerHorizontal="true"/>-->
+    <!--<com.github.mikephil.charting.charts.HorizontalBarChart-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="300dp"-->
+        <!--android:id="@+id/horizontalBarChartActivitySummary"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_centerHorizontal="true"/>-->
+    <!---->
+
+
+    <com.github.mikephil.charting.charts.BarChart
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:id="@+id/barChartActivitySummary"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"/>
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_above="@+id/barChartActivitySummary"
+        android:layout_below="@+id/txtActivityTrendTitle"
+        android:gravity="center">
+
+        <TableRow android:layout_margin="5dp">
+            <LinearLayout android:orientation="vertical" android:layout_gravity="center" android:layout_column="1" android:layout_width="100dp">
+              <ImageView android:src="@drawable/jogging" android:layout_width="50dp"
+                       android:layout_height="50dp" android:layout_gravity="center"/>
+                <!--<TextView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"  android:text="Jogging" />-->
+           </LinearLayout>
+
+            <LinearLayout android:orientation="vertical" android:layout_gravity="center_vertical" android:layout_column="2" android:layout_width="100dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:id="@+id/txtJogging" android:text="0 mins"/>
+            </LinearLayout>
+
+            <LinearLayout android:orientation="vertical"  android:layout_gravity="center" android:layout_column="3" android:layout_width="100dp">
+                <ImageView android:src="@drawable/walking"  android:layout_gravity="center" android:layout_width="50dp"
+                           android:layout_height="50dp"/>
+                <!--<TextView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content" android:text="Walking" />-->
+            </LinearLayout>
+
+
+            <LinearLayout android:orientation="vertical" android:layout_gravity="center_vertical" android:layout_column="4" android:layout_width="100dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"  android:id="@+id/txtWalking" android:text="10 mins" />
+            </LinearLayout>
+
+        </TableRow>
+
+
+        <TableRow android:layout_margin="5dp">
+            <LinearLayout android:orientation="vertical"  android:layout_gravity="center" android:layout_column="1" android:layout_width="100dp">
+                <ImageView android:src="@drawable/upstairs"  android:layout_gravity="center" android:layout_width="50dp"
+                           android:layout_height="50dp"/>
+                <!--<TextView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"  android:layout_gravity="center" android:text="Upstairs" />-->
+            </LinearLayout>
+
+            <LinearLayout android:orientation="vertical" android:layout_gravity="center_vertical" android:layout_column="2" android:layout_width="100dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"  android:id="@+id/txtUpstairs" android:text="10 mins" />
+            </LinearLayout>
+
+            <LinearLayout android:orientation="vertical"  android:layout_gravity="center" android:layout_column="3" android:layout_width="100dp">
+                <ImageView android:src="@drawable/downstairs"  android:layout_gravity="center" android:layout_width="50dp"
+                           android:layout_height="50dp"/>
+                <!--<TextView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content" android:text="Downstairs" />-->
+            </LinearLayout>
+
+
+            <LinearLayout android:orientation="vertical" android:layout_gravity="center_vertical" android:layout_column="4" android:layout_width="100dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"  android:id="@+id/txtDownstairs" android:text="10 mins" />
+            </LinearLayout>
+
+        </TableRow>
+
+
+        <TableRow android:layout_margin="5dp">
+            <LinearLayout android:orientation="vertical"  android:layout_gravity="center" android:layout_column="1" android:layout_width="100dp">
+                <ImageView android:src="@drawable/standing"  android:layout_gravity="center" android:layout_width="50dp"
+                           android:layout_height="50dp"/>
+                <!--<TextView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content" android:text="Standing" />-->
+            </LinearLayout>
+
+            <LinearLayout android:orientation="vertical" android:layout_gravity="center_vertical" android:layout_column="2" android:layout_width="100dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"  android:id="@+id/txtStanding" android:text="20 mins" />
+            </LinearLayout>
+
+            <LinearLayout android:orientation="vertical"  android:layout_gravity="center" android:layout_column="3" android:layout_width="100dp">
+                <ImageView android:src="@drawable/sitting"  android:layout_gravity="center" android:layout_width="50dp"
+                           android:layout_height="50dp"/>
+                <!--<TextView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content" android:text="Sitting" />-->
+            </LinearLayout>
+
+
+            <LinearLayout android:orientation="vertical" android:layout_gravity="center_vertical" android:layout_column="4" android:layout_width="100dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"  android:id="@+id/txtSitting"  android:text="10 mins" />
+            </LinearLayout>
+
+        </TableRow>
+
+    </TableLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Activity Trend"
-        android:textSize="40sp"
-        android:textStyle="bold"/>
-
+        android:id="@+id/txtActivityTrendTitle"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"/>
 </RelativeLayout>

@@ -20,11 +20,32 @@ public class PredictionSample implements java.io.Serializable {
         m_AccelerometerX = new ArrayList<Double>();
         m_AccelerometerY = new ArrayList<Double>();
         m_AccelerometerZ = new ArrayList<Double>();
+        m_TimeStamp = new ArrayList<Long>();
     }
 
     private ArrayList<Double> m_AccelerometerX;
     private ArrayList<Double> m_AccelerometerY;
     private ArrayList<Double> m_AccelerometerZ;
+    private ArrayList<Long> m_TimeStamp;
+    private long m_SampleStartTime;
+    private long m_SampleEndTime;
+
+
+    public long getM_SampleEndTime() {
+        return m_SampleEndTime;
+    }
+
+    public void setM_SampleEndTime(long m_SampleEndTime) {
+        this.m_SampleEndTime = m_SampleEndTime;
+    }
+
+    public long getM_SampleStartTime() {
+        return m_SampleStartTime;
+    }
+
+    public void setM_SampleStartTime(long m_SampleStartTime) {
+        this.m_SampleStartTime = m_SampleStartTime;
+    }
 
 
     public int Count(){
@@ -40,6 +61,10 @@ public class PredictionSample implements java.io.Serializable {
 
     public void AddAccelerometerZ(double z){
         m_AccelerometerZ.add((Double) z);
+    }
+
+    public void AddTimeStamp(long timestamp){
+        m_TimeStamp.add((long) timestamp);
     }
 
 
@@ -73,7 +98,6 @@ public class PredictionSample implements java.io.Serializable {
         sample.add(Mean_accel_x);
         sample.add(Mean_accel_y);
         sample.add(Mean_accel_z);
-
 
 
         double[] data = ArrayUtils.toPrimitive(sample.toArray(new Double[sample.size()]));

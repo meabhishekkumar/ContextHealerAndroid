@@ -1,6 +1,5 @@
 package edu.berkeley.datascience.contextualhealer.app;
 
-import android.app.Activity;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.support.design.widget.TabLayout;
@@ -9,9 +8,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
@@ -37,10 +33,33 @@ import edu.berkeley.datascience.contextualhealer.interfaces.IPredictor;
 import edu.berkeley.datascience.contextualhealer.activity.OnDevicePredictor;
 import edu.berkeley.datascience.contextualhealer.model.PredictionSample;
 import edu.berkeley.datascience.contextualhealer.R;
-import edu.berkeley.datascience.contextualhealer.adapter.RecyclerAdapter;
-import edu.berkeley.datascience.contextualhealer.model.Landscape;
 
 public class MainActivity extends AppCompatActivity {
+
+//    private Boolean mBound = false;
+//    private Button downloadButton;
+//    private Button playButton;
+//    private ContextRecognitionService mPlayerService;
+//
+//    private ServiceConnection mServiceConnection = new ServiceConnection() {
+//        @Override
+//        public void onServiceConnected(ComponentName name, IBinder binder) {
+//
+//            mBound = true;
+//            ContextRecognitionService.LocalBinder localBinder = (ContextRecognitionService.LocalBinder) binder;
+//            mPlayerService = localBinder.getService();
+//            if(mPlayerService.isPlaying()){
+//                playButton.setText("Pause");
+//            }
+//        }
+//
+//        @Override
+//        public void onServiceDisconnected(ComponentName name) {
+//            mBound = false;
+//        }
+//    };
+
+
     private float mLastX, mLastY, mLastZ;
     private double meanX, meanY, meanZ = 0.0;
     private float deltaX, deltaY, deltaZ;
@@ -132,8 +151,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void prepareDataResource() {
         mFragmentList.add(new fragmentActiveGoals());
-        mFragmentList.add(new fragmentActivityReport());
         mFragmentList.add(new fragmentActivityTrend());
+        mFragmentList.add(new fragmentActivityReport());
         mFragmentList.add(new fragmentCurrentActivity());
 
 
@@ -143,8 +162,8 @@ public class MainActivity extends AppCompatActivity {
     private void setTabIcons() {
 
         tabLayout.getTabAt(0).setIcon(R.drawable.selector_icon_target);
-        tabLayout.getTabAt(1).setIcon(R.drawable.selector_icon_graph);
-        tabLayout.getTabAt(2).setIcon(R.drawable.selector_icon_activity_trend);
+        tabLayout.getTabAt(1).setIcon(R.drawable.selector_icon_activity_trend);
+        tabLayout.getTabAt(2).setIcon(R.drawable.selector_icon_graph);
         tabLayout.getTabAt(3).setIcon(R.drawable.selector_icon_current_activity);
     }
 

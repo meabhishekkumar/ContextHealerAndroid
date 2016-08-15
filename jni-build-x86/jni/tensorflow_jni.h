@@ -26,7 +26,7 @@ extern "C" {
 #endif  // __cplusplus
 
 #define TENSORFLOW_METHOD(METHOD_NAME) \
-  Java_edu_berkeley_datascience_contextualhealer_ActivityDetector_##METHOD_NAME  // NOLINT
+  Java_edu_berkeley_datascience_contextualhealer_activity_ActivityDetector_##METHOD_NAME  // NOLINT
 
 JNIEXPORT jint JNICALL
 TENSORFLOW_METHOD(init)(
