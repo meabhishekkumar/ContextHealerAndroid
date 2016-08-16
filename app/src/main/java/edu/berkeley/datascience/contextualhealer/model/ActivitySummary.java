@@ -4,6 +4,7 @@ import android.graphics.drawable.ColorDrawable;
 
 import edu.berkeley.datascience.contextualhealer.R;
 
+
 public class ActivitySummary {
 
 

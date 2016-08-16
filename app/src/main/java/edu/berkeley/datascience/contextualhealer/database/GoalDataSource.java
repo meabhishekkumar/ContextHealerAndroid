@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import edu.berkeley.datascience.contextualhealer.R;
 import edu.berkeley.datascience.contextualhealer.activity.ActivityType;
+import edu.berkeley.datascience.contextualhealer.model.ActivitySample;
 import edu.berkeley.datascience.contextualhealer.model.ActivitySummary;
 import edu.berkeley.datascience.contextualhealer.model.Goal;
 import edu.berkeley.datascience.contextualhealer.model.GoalCompletion;
@@ -176,6 +177,32 @@ public class GoalDataSource {
     }
 
 
+    public ArrayList<ActivitySample> readActivitySamples(int duration){
+
+        String query =  "SELECT " +  GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_ACTIVITY_TYPE + ", " +
+                  GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_END_TIME_STAMP +
+                 " from "+ GoalSQLiteHelper.ACTIVITY_SAMPLES_TABLE ;
+
+        SQLiteDatabase database = open();
+        Cursor cursor = database.rawQuery(query, null);
+        ArrayList<ActivitySample> activitySamples = new ArrayList<ActivitySample>();
+
+        if(cursor.moveToFirst()){
+            do{
+
+                ActivitySample sample = new ActivitySample();
+                sample.setActivityType(getStringFromColumnName(cursor, GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_ACTIVITY_TYPE));
+                sample.setEndTimeStamp(getStringFromColumnName(cursor, GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_END_TIME_STAMP));
+                activitySamples.add(sample);
+            }while(cursor.moveToNext());
+        }
+        cursor.close();
+        close(database);
+        return activitySamples;
+    }
+
+
+
     public int readGoalsSetCount(){
 
         int setGoalsCount = 0;
@@ -235,6 +262,8 @@ public class GoalDataSource {
         close(database);
         return result;
     }
+
+
 
 
 

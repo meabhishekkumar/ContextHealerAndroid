@@ -29,6 +29,7 @@ import edu.berkeley.datascience.contextualhealer.fragment.fragmentActiveGoals;
 import edu.berkeley.datascience.contextualhealer.fragment.fragmentActivityReport;
 import edu.berkeley.datascience.contextualhealer.fragment.fragmentActivityTrend;
 import edu.berkeley.datascience.contextualhealer.fragment.fragmentCurrentActivity;
+import edu.berkeley.datascience.contextualhealer.fragment.fragmentCurrentActivityTimeLine;
 import edu.berkeley.datascience.contextualhealer.interfaces.IPredictor;
 import edu.berkeley.datascience.contextualhealer.activity.OnDevicePredictor;
 import edu.berkeley.datascience.contextualhealer.model.PredictionSample;
@@ -153,7 +154,8 @@ public class MainActivity extends AppCompatActivity {
         mFragmentList.add(new fragmentActiveGoals());
         mFragmentList.add(new fragmentActivityTrend());
         mFragmentList.add(new fragmentActivityReport());
-        mFragmentList.add(new fragmentCurrentActivity());
+        //mFragmentList.add(new fragmentCurrentActivity());
+        mFragmentList.add(new fragmentCurrentActivityTimeLine());
 
 
     }

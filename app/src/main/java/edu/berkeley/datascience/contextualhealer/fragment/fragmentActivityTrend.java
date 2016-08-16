@@ -95,10 +95,7 @@ public class fragmentActivityTrend extends Fragment {
         GoalDataSource dataSource = new GoalDataSource(mContext);
         ArrayList<ActivitySummary> activitySummaries =  dataSource.readActivitySummary();
 
-        //TODO: REMOVE IT LATER
-        int totalCount = dataSource.readGoalsSetCount();
-        float avgCompletion = dataSource.readGoalsAverageCompletionPercentage();
-        ArrayList<GoalCompletion> avgCompletionBreakup = dataSource.readGoalCompletionByType();
+
 
 
         ArrayList<BarEntry> barEntries = new ArrayList<>();
@@ -163,30 +160,6 @@ public class fragmentActivityTrend extends Fragment {
         barEntries.add(barEntrySitting);
 
 
-
-
-//        for(ActivitySummary summary : activitySummaries){
-//
-//            String color = getResources().getString(summary.getActivityColor(summary.getActivityType()));
-//            Float duration = (float)summary.getTotalDurationInMins();
-//            String activity = summary.getActivityType();
-//            Log.v(TAG, "Activity : " + summary.getActivityType() +  " Duration : "+ summary.getTotalDurationInMins() + " Mins , Color  " + color);
-//
-//            barLabels[Count] = activity.toString();
-//            barColors[Count] = summary.getActivityColor(summary.getActivityType());
-//            BarEntry barEntry = new BarEntry((float)Count, duration);
-//            barEntries.add(barEntry);
-//            Count = Count + 1;
-//        }
-
-
-
-
-//        int[] colors= new int[] {
-//                R.color.color_activity_jogging,
-//                R.color.color_activity_jogging,
-//                R.color.activity_sitting, R.color.activity_upstairs,
-//                R.color.activity_standing, R.color.activity_unknown, R.color.activity_walking};
 
         BarDataSet dataset = new BarDataSet(barEntries,"Activities");
         dataset.setColors(barColors, mContext);

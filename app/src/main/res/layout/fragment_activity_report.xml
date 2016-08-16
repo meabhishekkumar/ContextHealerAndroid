@@ -11,35 +11,95 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Goal Report"
         android:id="@+id/txtActivityReportTitle"
+        android:layout_marginTop="20dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"/>
 
     <com.github.mikephil.charting.charts.HorizontalBarChart
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="300dp"
         android:id="@+id/chartGoalCompletion"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"/>
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/chartGoalCompletion"
-        android:layout_below="@+id/txtActivityReportTitle"
-        android:layout_alignParentEnd="true">
+    <LinearLayout android:orientation="horizontal" android:layout_height="wrap_content" android:layout_width="fill_parent"
+                  android:layout_above="@id/chartGoalCompletion"
+                  android:layout_below="@id/txtActivityReportTitle"
+        android:layout_alignBaseline="@id/chartGoalCompletion">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="200dp">
-            
+        <!-- Left Block -->
+        <LinearLayout android:layout_weight="1" android:layout_gravity="center" android:layout_height="100dp" android:layout_margin="20dp" android:layout_width="match_parent" android:background="@color/colorAccent">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" android:orientation="horizontal" android:layout_gravity="center_vertical">
+
+                <ImageView
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_access_alarm_white_36dp"
+                    android:layout_column="1"
+                    android:layout_marginTop="16dp"/>
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:orientation="vertical" android:layout_gravity="center_vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:id="@+id/txtActivityReportTotalGoalsCompleted" android:text="00" android:textColor="@android:color/white"  android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:textColor="@android:color/white" android:layout_marginTop="5dp"  android:text="Goals Completed" />
+                </LinearLayout>
+
+
+            </LinearLayout>
+
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="200dp">
+        <!-- Right Block -->
+        <LinearLayout android:layout_weight="1" android:layout_gravity="center" android:layout_height="100dp" android:layout_margin="20dp" android:layout_width="match_parent" android:background="@color/colorAccent">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" android:orientation="horizontal" android:layout_gravity="center_vertical">
+
+                <ImageView
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_access_alarm_white_36dp"
+                    android:layout_column="1"
+                    android:layout_marginTop="16dp"/>
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:orientation="vertical" android:layout_gravity="center_vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:id="@+id/txtActivityReportAvgCompletion" android:text="00 %" android:textColor="@android:color/white"  android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+                    <TextView
+                        android:layout_width="match_parent" android:layout_marginTop="5dp"
+                        android:layout_height="wrap_content" android:textColor="@android:color/white"  android:text="Average Completion" />
+                </LinearLayout>
+
+
+            </LinearLayout>
 
         </LinearLayout>
+
     </LinearLayout>
+
+
+
 
 </RelativeLayout>
