@@ -27,22 +27,28 @@ public class GoalSQLiteHelper extends SQLiteOpenHelper {
     private static final int DB_VERSION = 1; // Database version
     private static Random rand = new Random();
 
-    //Table: Goals
-//    GoalID : int : AutoIncrement
-//    GoalTitle : Text : 200
-//    GoalType : Text : 100 : Running, Jogging, Walking ( fixed options)
-//    GoalDurationInMinutes : Int : Number of minutes the activity to be performed
-//    GoalDescription : Text : 400 : Summary of Goal : Jogging for 10 mins
-//    GoalDays : What are days we need to track : Format : MON,TUE,WED,THR
-//    GoalStartTime : Text : 24 hour format : 08:00
-//    GoalEndTime: Text : 24 Hour Format : 15:00
-//    IsGoalCurrentlyTracked : Int : 0 or 1 : 1 means true, 0 means false
-//    IsGoalDeleted : Int 0 or 1
-//    CompletedDurationInMinutes : int : Number of minutes already performed for the given block
-//    CompletedPercentage : int : PercentageOfCompletion
+    private static GoalSQLiteHelper sInstance;
+    //TO make it singleton
+    //See more at: http://www.tothenew.com/blog/sqlite-locking-and-transaction-handling-in-android/#sthash.iOm8GnTU.dpuf
 
 
-    //Table Name
+    public static synchronized GoalSQLiteHelper getInstance(Context context){
+        // Use the application context, which will ensure that you don't accidentally leak an Activity's context.
+        if (sInstance == null) {
+            sInstance = new GoalSQLiteHelper(context.getApplicationContext());
+        }
+        return sInstance;
+    }
+
+    public GoalSQLiteHelper(Context context){
+        super(context,DB_NAME, null, DB_VERSION);
+    }
+
+
+
+
+
+    //Table Name - GOALS -------------------------------------
     public static final String GOALS_TABLE = "GOALS";
     //Columns
     public static final String COLUMN_GOAL_TITLE = "GOAL_TITLE";
@@ -72,7 +78,7 @@ public class GoalSQLiteHelper extends SQLiteOpenHelper {
                     COLUMN_IS_GOAL_DELETED + " INTEGER)";
 
 
-    //Table Name
+    //Table Name --------------- GOALS_COMPLETION -------------------------------
     public static final String GOALS_COMPLETION_TABLE = "GOALS_COMPLETION";
     //Columns
     public static final String COLUMN_COMPLETION_TABLE_GOAL_ID = "GOALS_ID";
@@ -102,6 +108,8 @@ public class GoalSQLiteHelper extends SQLiteOpenHelper {
 
     //Computed Columns
     public static final String COLUMN_ACTIVITY_SAMPLES_TOTAL_DURATION_IN_MINS = "TOTAL_DURATION_IN_MINS";
+    public static final String COLUMN_ACTIVITY_SAMPLES_TOTAL_DURATION_IN_MILLI_SECS = "TOTAL_DURATION_IN_MILLI_SECS";
+
 
     private static String CREATE_ACTIVITY_SAMPLES =
             "CREATE TABLE "+ ACTIVITY_SAMPLES_TABLE + "( " +
@@ -132,9 +140,7 @@ public class GoalSQLiteHelper extends SQLiteOpenHelper {
 
     //Meme Table Annotations functionality
 
-    public GoalSQLiteHelper(Context context){
-        super(context,DB_NAME, null, DB_VERSION);
-    }
+
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -143,7 +149,7 @@ public class GoalSQLiteHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_ACTIVITY_SAMPLES);
         db.execSQL(CREATE_GOALS_COMPLETION);
 
-        //SeedDatabase(db);
+        SeedDatabase(db);
         //db.execSQL(CREATE_ANNOTATIONS);
     }
 
@@ -280,7 +286,7 @@ public class GoalSQLiteHelper extends SQLiteOpenHelper {
         rand.setSeed(100);
 
         String[] activities = {"downstairs","jogging","sitting","upstairs","walking","unknown","standing"};
-        for (int i=0; i<5; i++){
+        for (int i=0; i<10000; i++){
             DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");  //ISO 8601 format
             int durationInMilliSecs = 5 *1000;
 

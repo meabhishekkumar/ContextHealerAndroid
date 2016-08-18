@@ -29,17 +29,23 @@
         android:supportsRtl="true"
         android:theme="@style/MaterialTheme">
         <!-- Launch Screen -->
-        <activity android:name=".app.SplashScreenActivity">
+        <activity android:name=".app.SplashScreenActivity"
+                  android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
+                  android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".app.MainActivity"/>
-        <activity android:name=".app.CreateGoalActivity"/>
-        <activity android:name=".app.SettingsActivity"/>
-        <activity android:name=".app.ContextualHealerSettingsActivity"/>
+        <activity android:name=".app.MainActivity"  android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".app.CreateGoalActivity"  android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".app.SettingsActivity"  android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".app.ContextualHealerSettingsActivity"  android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
+                  android:screenOrientation="portrait"/>
 
         <service android:name=".service.ContextRecognitionService"/>
 

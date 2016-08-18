@@ -8,7 +8,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.TimeZone;
+
+import edu.berkeley.datascience.contextualhealer.model.ActivitySample;
 
 public class CommonUtil {
 
@@ -45,6 +50,30 @@ public class CommonUtil {
             e.printStackTrace();
         }
         return  date;
+    }
+
+    public static Date ParseTimeStampString(String timeStampString){
+        //parse the date string format to date : yyyy-MM-dd
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        Date date = null;
+        try {
+            date = sdf.parse(timeStampString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return  date;
+    }
+
+    public static Boolean IsBetweenLastOneHour(Date timeStamp){
+        Calendar currentTimeStamp = Calendar.getInstance();
+        currentTimeStamp.setTime(new Date(System.currentTimeMillis()));
+        Date currentTime = currentTimeStamp.getTime();
+
+        //Subtract one hour from current time
+        currentTimeStamp.add(Calendar.HOUR, -1);
+        Date oneHourBack = currentTimeStamp.getTime();
+
+        return oneHourBack.compareTo(timeStamp) * timeStamp.compareTo(currentTime) >= 0;
     }
 
 
@@ -149,5 +178,42 @@ public class CommonUtil {
         bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
         return bd.floatValue();
     }
+
+
+    public static ArrayList<ActivitySample> GetActivitySampleForTimeLine(ArrayList<ActivitySample> samples){
+
+        // sort the collection in reverse order
+        Collections.sort(samples, new Comparator<ActivitySample>() {
+            public int compare(ActivitySample o1, ActivitySample o2) {
+                return o2.getEndTimeStampInDate().compareTo(o1.getEndTimeStampInDate());
+            }
+        });
+
+        ArrayList<ActivitySample> finalSamples = new ArrayList<ActivitySample>();
+        // Iterate through it. if the activity is changed then only add it to final list
+
+        String currentActivity = null;
+        for(ActivitySample sample: samples){
+
+            if(currentActivity == null || !sample.getActivityType().equals(currentActivity)){
+                finalSamples.add(sample);
+                currentActivity = sample.getActivityType();
+            }
+        }
+
+        return  finalSamples;
+    }
+
+    public static String GetTimeStampInLocalTimeZone(Date timestamp){
+        Calendar cal = Calendar.getInstance();
+        TimeZone tz = cal.getTimeZone();
+        cal.setTime(timestamp);
+        DateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+        formatter.setCalendar(cal);
+        formatter.setTimeZone(tz);
+        return formatter.format(cal.getTime());
+    }
+
+
 
 }

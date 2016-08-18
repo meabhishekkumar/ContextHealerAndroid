@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.concurrent.locks.Lock;
@@ -20,6 +21,7 @@ import edu.berkeley.datascience.contextualhealer.utils.CommonUtil;
 
 public class GoalDataSource {
 
+    private static final String TAG = "UPDATE_DB";
     private Context mContext;
     private GoalSQLiteHelper mGoalSQLiteHelper;
     private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
@@ -28,7 +30,11 @@ public class GoalDataSource {
 
     public GoalDataSource(Context context){
         mContext = context;
-        mGoalSQLiteHelper = new GoalSQLiteHelper(context);
+        //mGoalSQLiteHelper = new GoalSQLiteHelper(context);
+        //Create from singleton
+        mGoalSQLiteHelper = GoalSQLiteHelper.getInstance(context);
+
+
         //For initial seeding
         //SQLiteDatabase database = mGoalSQLiteHelper.getReadableDatabase();
         //database.close();
@@ -103,7 +109,7 @@ public class GoalDataSource {
             }while(cursor.moveToNext());
         }
         cursor.close();
-        close(database);
+        //close(database);  //TODO : Check if it is required to close it , if using singleton
         return activeGoals;
     }
 
@@ -131,7 +137,7 @@ public class GoalDataSource {
 
         database.setTransactionSuccessful();
         database.endTransaction();
-        close(database);
+        //close(database);  //TODO : Check if it is required to close it , if using singleton
 
     }
 
@@ -158,9 +164,8 @@ public class GoalDataSource {
 
         database.setTransactionSuccessful();
         database.endTransaction();
-        close(database);
+        //close(database);  //TODO : Check if it is required to close it , if using singleton
     }
-
 
     public void delete(int goalId){
         SQLiteDatabase database = open();
@@ -173,15 +178,14 @@ public class GoalDataSource {
 
         database.setTransactionSuccessful();
         database.endTransaction();
-        close(database);
+        //close(database);  //TODO : Check if it is required to close it , if using singleton
     }
-
 
     public ArrayList<ActivitySummary> readActivitySummary(){
 
        String query =  "SELECT " +  GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_ACTIVITY_TYPE + ", " +
                 "SUM(" +   GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_DURATION_IN_MILLI_SECS +
-                 ")  / (60*1000) " + GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_TOTAL_DURATION_IN_MINS  +" from "+ GoalSQLiteHelper.ACTIVITY_SAMPLES_TABLE + " group by " +
+                 " / (60.0 * 1000.0))  " + GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_TOTAL_DURATION_IN_MINS  +" from "+ GoalSQLiteHelper.ACTIVITY_SAMPLES_TABLE + " group by " +
                GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_ACTIVITY_TYPE ;
 
         SQLiteDatabase database = open();
@@ -190,24 +194,27 @@ public class GoalDataSource {
 
         if(cursor.moveToFirst()){
             do{
+                String activityType = getStringFromColumnName(cursor, GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_ACTIVITY_TYPE);
+                float TotalDurationInMinutes = getFloatFromColumnName(cursor, GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_TOTAL_DURATION_IN_MINS);
+                Log.v(TAG, "activity type : "+ activityType + " Total duration :" + TotalDurationInMinutes );
 
                 ActivitySummary summary = new ActivitySummary(
-                        getStringFromColumnName(cursor, GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_ACTIVITY_TYPE),
-                        getIntFromColumnName(cursor, GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_TOTAL_DURATION_IN_MINS));
+                        activityType,
+                        TotalDurationInMinutes);
                 activitySummaries.add(summary);
             }while(cursor.moveToNext());
         }
         cursor.close();
-        close(database);
+        //close(database);  //TODO : Check if it is required to close it , if using singleton
         return activitySummaries;
     }
-
 
     public ArrayList<ActivitySample> readActivitySamples(int duration){
 
         String query =  "SELECT " +  GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_ACTIVITY_TYPE + ", " +
                   GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_END_TIME_STAMP +
-                 " from "+ GoalSQLiteHelper.ACTIVITY_SAMPLES_TABLE ;
+                 " from "+ GoalSQLiteHelper.ACTIVITY_SAMPLES_TABLE + " where " + GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_ACTIVITY_TYPE +
+                 " not like 'unknown'";
 
         SQLiteDatabase database = open();
         Cursor cursor = database.rawQuery(query, null);
@@ -218,16 +225,24 @@ public class GoalDataSource {
 
                 ActivitySample sample = new ActivitySample();
                 sample.setActivityType(getStringFromColumnName(cursor, GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_ACTIVITY_TYPE));
-                sample.setEndTimeStamp(getStringFromColumnName(cursor, GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_END_TIME_STAMP));
-                activitySamples.add(sample);
+                String endTimeStamp = getStringFromColumnName(cursor, GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_END_TIME_STAMP);
+                sample.setEndTimeStamp(endTimeStamp);
+                sample.setEndTimeStampInDate(CommonUtil.ParseTimeStampString(endTimeStamp));
+                if(CommonUtil.IsBetweenLastOneHour(CommonUtil.ParseTimeStampString(endTimeStamp))){
+
+                    // If timestamp is between last one hour
+                    activitySamples.add(sample);
+                }
+
             }while(cursor.moveToNext());
         }
         cursor.close();
-        close(database);
-        return activitySamples;
+        //close(database);  //TODO : Check if it is required to close it , if using singleton
+
+        //Now the activities are available : Let's work and sort it in descending order
+        return CommonUtil.GetActivitySampleForTimeLine(activitySamples);
+
     }
-
-
 
     public int readGoalsSetCount(){
 
@@ -243,10 +258,9 @@ public class GoalDataSource {
             }while(cursor.moveToNext());
         }
         cursor.close();
-        close(database);
+        //close(database);  //TODO : Check if it is required to close it , if using singleton
         return setGoalsCount;
     }
-
 
     public float readGoalsAverageCompletionPercentage(){
 
@@ -262,7 +276,7 @@ public class GoalDataSource {
             }while(cursor.moveToNext());
         }
         cursor.close();
-        close(database);
+        //close(database);  //TODO : Check if it is required to close it , if using singleton
         return avgCompletion;
     }
 
@@ -285,11 +299,12 @@ public class GoalDataSource {
             }while(cursor.moveToNext());
         }
         cursor.close();
-        close(database);
+        //close(database);  //TODO : Check if it is required to close it , if using singleton
         return result;
     }
 
     public boolean IsGoalCompletionRowInDB(GoalCompletion goalCompletion){
+
         int goalCompletionCount = 0;
         String query =  "SELECT count(*) Total_Count from "+ GoalSQLiteHelper.GOALS_COMPLETION_TABLE +
                 " WHERE " + GoalSQLiteHelper.COLUMN_COMPLETION_TABLE_GOAL_ID + " == " + goalCompletion.getGoalID() +
@@ -305,8 +320,9 @@ public class GoalDataSource {
             }while(cursor.moveToNext());
         }
         cursor.close();
-        close(database);
+        //close(database);  //TODO : Check if it is required to close it , if using singleton
         return (goalCompletionCount > 0);
+
     }
 
     public GoalCompletion readGoalCompletionIDDateWise(int goalID, String goalDate){
@@ -332,7 +348,7 @@ public class GoalDataSource {
             }while(cursor.moveToNext());
         }
         cursor.close();
-        close(database);
+        //close(database);  //TODO : Check if it is required to close it , if using singleton
         return goalCompletion;
     }
 
@@ -347,15 +363,12 @@ public class GoalDataSource {
 
         database.update(GoalSQLiteHelper.GOALS_COMPLETION_TABLE,
                 updateGoalCompletionValues,
-                String.format("%s=%d", BaseColumns._ID, goalCompletion.getGoalID()),null);
+                String.format("%s=%d", GoalSQLiteHelper.COLUMN_COMPLETION_TABLE_GOAL_ID, goalCompletion.getGoalID()),null);
 
         database.setTransactionSuccessful();
         database.endTransaction();
-        close(database);
+        //close(database);  //TODO : Check if it is required to close it , if using singleton
     }
-
-
-
 
     //Insert
     public void insertActivitySample(ActivitySample sample){
@@ -373,12 +386,12 @@ public class GoalDataSource {
 
         database.setTransactionSuccessful();
         database.endTransaction();
-        close(database);
+        //close(database);  //TODO : Check if it is required to close it , if using singleton
     }
-
 
     //Insert
     public void insertGoalCompletion(GoalCompletion goalCompletion){
+
         SQLiteDatabase database = open();
 
         database.beginTransaction();
@@ -393,12 +406,8 @@ public class GoalDataSource {
 
         database.setTransactionSuccessful();
         database.endTransaction();
-        close(database);
+        //close(database);  //TODO : Check if it is required to close it , if using singleton
     }
-
-
-
-
 
     //Helpers
     private int getIntFromColumnName(Cursor cursor, String columnName){
@@ -418,32 +427,5 @@ public class GoalDataSource {
 
 
 
-
-
-    // Mocked Data
-//    public static ArrayList<Goal> getMockedActiveGoals() {
-//
-//        ArrayList<Goal> dataList = new ArrayList<>();
-//
-//        //Activity - 1
-//        Goal goal_1 = new Goal(1, "Morning Jogging",ActivityType.jogging.toString(),20, "MON,TUE,WED","07:00", "08:00", 1,0);
-//        goal_1.setCompletedPercentage(70);
-//
-//        Goal goal_2 = new Goal(2, "Walking to Office",ActivityType.walking.toString(),10, "WED,FRI","09:00", "10:00", 1,0);
-//        goal_2.setCompletedPercentage(50);
-//
-//
-//        Goal goal_3 = new Goal(3, "Use Stairs",ActivityType.staircase.toString(),10, "SAT,SUN","10:00", "22:00", 1,0);
-//        goal_3.setCompletedPercentage(20);
-//
-//
-//        dataList.add(goal_1);
-//        dataList.add(goal_2);
-//        dataList.add(goal_3);
-//
-//
-//
-//        return dataList;
-//    }
 
 }

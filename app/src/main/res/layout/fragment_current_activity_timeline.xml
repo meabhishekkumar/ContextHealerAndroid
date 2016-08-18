@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Current Activity (Last 5 Minutes)"
+        android:text="Current Activity (Last 1 hour)"
         android:id="@+id/txtCurrentActivityTitle"
         android:layout_marginTop="10dp"
         android:layout_alignParentTop="true"

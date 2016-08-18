@@ -343,24 +343,27 @@ public class ContextRecognitionService extends Service implements SensorEventLis
                 Log.v("UPDATE_DB", "Is To be Updated or inserted ");
                 String currentDate = CommonUtil.GetCurrentDateString();
                 float completionPercentage = 0.0f;
-                if(goal.getGoalDurationInMinutes() > 0.0f){
-                    completionPercentage = SensorBlockInSeconds / (goal.getGoalDurationInMinutes() * 60);
+                if(goal.getGoalDurationInMinutes() > 0){
+                    completionPercentage = 100.0f * (SensorBlockInSeconds /(float) (goal.getGoalDurationInMinutes() * 60));
                 }
 
                 String goalType = goal.getGoalType();
                 GoalCompletion existingGoalCompletionRow = datasource.readGoalCompletionIDDateWise(goalID, currentDate);
+
                 if(existingGoalCompletionRow != null){
                     //Update the completion percentage if completion percentage for (GOAL_ID, GOAL_DATE) pair is already available in the databse
                     //Add the existing the completion percentage with new
-                    completionPercentage = existingGoalCompletionRow.getGoalCompletionPercentage() + completionPercentage;
-                    if(completionPercentage < 100.0){
+                    float existingCompletionPercentage = existingGoalCompletionRow.getGoalCompletionPercentage();
+                    Log.v("UPDATE_DB", "Existing Completion Percentage : " + existingCompletionPercentage + " for goal ID " + goalID);
+                    completionPercentage = existingCompletionPercentage + completionPercentage;
+                    Log.v("UPDATE_DB", "Updated Completion Percentage : " + completionPercentage + " for goal ID " + goalID);
+                    if(completionPercentage < 100.0f){
 
                         Log.v("UPDATE_DB", "Updated...");
 
                         // if completion exceeds 100 then do nothing, else update the value
                         GoalCompletion goalCompletion = new GoalCompletion(goalID, currentDate, completionPercentage, goalType);
                         datasource.updateGoalCompletionPercentage(goalCompletion);
-
 
                     }
 

@@ -1,11 +1,17 @@
 package edu.berkeley.datascience.contextualhealer.model;
 
+import java.util.Date;
+
 import edu.berkeley.datascience.contextualhealer.R;
 
 public class ActivitySample {
 
     private String mStartTimeStamp;
     private String mEndTimeStamp;
+
+
+
+    private Date mEndTimeStampInDate;
     private int mDurationInMilliSecs;
     private String mActivityType;
 
@@ -19,6 +25,8 @@ public class ActivitySample {
         mDurationInMilliSecs = durationInMilliSecs;
         mActivityType = activityType;
     }
+
+
 
     public String getStartTimeStamp() {
         return mStartTimeStamp;
@@ -50,6 +58,14 @@ public class ActivitySample {
 
     public void setEndTimeStamp(String endTimeStamp) {
         mEndTimeStamp = endTimeStamp;
+    }
+
+    public Date getEndTimeStampInDate() {
+        return mEndTimeStampInDate;
+    }
+
+    public void setEndTimeStampInDate(Date endTimeStampInDate) {
+        mEndTimeStampInDate = endTimeStampInDate;
     }
 
     public int getActivityIcon(String activityType){

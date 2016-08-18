@@ -9,9 +9,9 @@ public class ActivitySummary {
 
 
     private String mActivityType;
-    private int mTotalDurationInMins;
+    private float mTotalDurationInMins;
 
-    public ActivitySummary(String activityType, int totalDurationInMins){
+    public ActivitySummary(String activityType, float totalDurationInMins){
         mActivityType = activityType;
         mTotalDurationInMins = totalDurationInMins;
     }
@@ -24,11 +24,11 @@ public class ActivitySummary {
         mActivityType = activityType;
     }
 
-    public int getTotalDurationInMins() {
+    public float getTotalDurationInMins() {
         return mTotalDurationInMins;
     }
 
-    public void setTotalDurationInMins(int totalDurationInMins) {
+    public void setTotalDurationInMins(float totalDurationInMins) {
         mTotalDurationInMins = totalDurationInMins;
     }
 

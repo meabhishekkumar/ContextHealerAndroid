@@ -29,6 +29,7 @@ import edu.berkeley.datascience.contextualhealer.R;
 import edu.berkeley.datascience.contextualhealer.database.GoalDataSource;
 import edu.berkeley.datascience.contextualhealer.model.ActivitySummary;
 import edu.berkeley.datascience.contextualhealer.model.GoalCompletion;
+import edu.berkeley.datascience.contextualhealer.utils.CommonUtil;
 
 public class fragmentActivityTrend extends Fragment {
 
@@ -111,7 +112,7 @@ public class fragmentActivityTrend extends Fragment {
 
         //Jogging
         ActivitySummary jogging = getActivitySummary(activitySummaries, "jogging");
-        txtJogging.setText(jogging.getTotalDurationInMins() + " mins");
+        txtJogging.setText(CommonUtil.round(jogging.getTotalDurationInMins(),1) + " mins");
         barLabels[0] = "jogging";
         barColors[0] = jogging.getActivityColor(jogging.getActivityType());
         BarEntry barEntryJogging = new BarEntry(1f, (float)jogging.getTotalDurationInMins());
@@ -119,7 +120,7 @@ public class fragmentActivityTrend extends Fragment {
 
         //Walking
         ActivitySummary walking = getActivitySummary(activitySummaries, "walking");
-        txtWalking.setText(walking.getTotalDurationInMins() + " mins");
+        txtWalking.setText(CommonUtil.round(walking.getTotalDurationInMins(),1) + " mins");
         barLabels[1] = "walking";
         barColors[1] = walking.getActivityColor(walking.getActivityType());
         BarEntry barEntryWalking = new BarEntry(2f, (float)walking.getTotalDurationInMins());
@@ -127,7 +128,7 @@ public class fragmentActivityTrend extends Fragment {
 
         //upstairs
         ActivitySummary upstairs = getActivitySummary(activitySummaries, "upstairs");
-        txtUpstairs.setText(walking.getTotalDurationInMins() + " mins");
+        txtUpstairs.setText(CommonUtil.round(walking.getTotalDurationInMins(),1) + " mins");
         barLabels[2] = "upstairs";
         barColors[2] = upstairs.getActivityColor(upstairs.getActivityType());
         BarEntry barEntryUpstairs = new BarEntry(3f, (float)upstairs.getTotalDurationInMins());
@@ -136,7 +137,7 @@ public class fragmentActivityTrend extends Fragment {
 
         //downstairs
         ActivitySummary downstairs = getActivitySummary(activitySummaries, "downstairs");
-        txtDownstairs.setText(downstairs.getTotalDurationInMins() + " mins");
+        txtDownstairs.setText(CommonUtil.round(downstairs.getTotalDurationInMins(),1) + " mins");
         barLabels[3] = "downstairs";
         barColors[3] = downstairs.getActivityColor(downstairs.getActivityType());
         BarEntry barEntryDownstairs = new BarEntry(4f, (float)downstairs.getTotalDurationInMins());
@@ -145,7 +146,7 @@ public class fragmentActivityTrend extends Fragment {
 
         //standing
         ActivitySummary standing = getActivitySummary(activitySummaries, "standing");
-        txtStanding.setText(standing.getTotalDurationInMins() + " mins");
+        txtStanding.setText(CommonUtil.round(standing.getTotalDurationInMins(),1) + " mins");
         barLabels[4] = "standing";
         barColors[4] = standing.getActivityColor(standing.getActivityType());
         BarEntry barEntryStanding = new BarEntry(5f, (float)standing.getTotalDurationInMins());
@@ -153,7 +154,7 @@ public class fragmentActivityTrend extends Fragment {
 
         //sitting
         ActivitySummary sitting = getActivitySummary(activitySummaries, "sitting");
-        txtSitting.setText(sitting.getTotalDurationInMins() + " mins");
+        txtSitting.setText(CommonUtil.round(sitting.getTotalDurationInMins(),1) + " mins");
         barLabels[5] = "sitting";
         barColors[5] = sitting.getActivityColor(sitting.getActivityType());
         BarEntry barEntrySitting = new BarEntry(6f, (float)sitting.getTotalDurationInMins());

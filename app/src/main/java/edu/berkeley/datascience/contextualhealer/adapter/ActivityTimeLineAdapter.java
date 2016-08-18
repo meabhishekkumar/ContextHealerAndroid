@@ -17,6 +17,7 @@ import java.util.Date;
 
 import edu.berkeley.datascience.contextualhealer.R;
 import edu.berkeley.datascience.contextualhealer.model.ActivitySample;
+import edu.berkeley.datascience.contextualhealer.utils.CommonUtil;
 
 
 public class ActivityTimeLineAdapter extends RecyclerView.Adapter<ActivityTimeLineAdapter.ActivityTimeLineViewHolder> {
@@ -54,16 +55,9 @@ public class ActivityTimeLineAdapter extends RecyclerView.Adapter<ActivityTimeLi
         ActivitySample timeLineModel = mFeedList.get(position);
         String activityType = timeLineModel.getActivityType();
         String endTimeStamp = timeLineModel.getEndTimeStamp();
-        String s = endTimeStamp.replace("Z", "+00:00");
-        s = s.substring(0, 22) + s.substring(23);
-        String TimelineText = activityType;
-        try {
-            Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").parse(s);
-            TimelineText = activityType + " at " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
+        Date endTimeStampDate = timeLineModel.getEndTimeStampInDate();
+        String endTimeStampDateString = CommonUtil.GetTimeStampInLocalTimeZone(endTimeStampDate);
+        String TimelineText = activityType + " at " + endTimeStampDateString;
 
         Drawable marker = mContext.getResources().getDrawable(timeLineModel.getActivityIcon(activityType));
 
