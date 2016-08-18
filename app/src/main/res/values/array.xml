@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="trackingModeEntries">
+        <item>Local</item>
+        <item>Server (require network)</item>
+    </string-array>
+
+    <string-array name="trackingModeValueEntries">
+        <item>TRACKING_LOCAL</item>
+        <item>TRACKING_SERVER</item>
+    </string-array>
+
+
+</resources>

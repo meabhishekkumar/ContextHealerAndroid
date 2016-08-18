@@ -19,6 +19,7 @@ import edu.berkeley.datascience.contextualhealer.activity.ActivityType;
 import edu.berkeley.datascience.contextualhealer.model.ActivitySample;
 import edu.berkeley.datascience.contextualhealer.model.Goal;
 import edu.berkeley.datascience.contextualhealer.model.GoalCompletion;
+import edu.berkeley.datascience.contextualhealer.utils.CommonUtil;
 
 public class GoalSQLiteHelper extends SQLiteOpenHelper {
 
@@ -47,9 +48,12 @@ public class GoalSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_GOAL_TITLE = "GOAL_TITLE";
     public static final String COLUMN_GOAL_TYPE = "GOAL_TYPE";
     public static final String COLUMN_GOAL_DURATION_IN_MINUTES = "GOAL_DURATION_IN_MINUTES";
-    public static final String COLUMN_GOAL_DAYS = "GOAL_DAYS";
+    public static final String COLUMN_GOAL_REPEAT_TYPE = "GOAL_REPEAT_TYPE";
+    public static final String COLUMN_GOAL_REPEAT_PATTERN = "GOAL_REPEAT_PATTERN";
+
     public static final String COLUMN_GOAL_START_TIME = "GOAL_START_TIME";
     public static final String COLUMN_GOAL_END_TIME = "GOAL_END_TIME";
+    public static final String COLUMN_GOAL_SET_DATE = "GOAL_SET_DATE";
     public static final String COLUMN_IS_GOAL_CURRENTLY_TRACKED = "IS_GOAL_CURRENTLY_TRACKED";
     public static final String COLUMN_IS_GOAL_DELETED = "IS_GOAL_DELETED";
 
@@ -59,9 +63,11 @@ public class GoalSQLiteHelper extends SQLiteOpenHelper {
                     COLUMN_GOAL_TITLE + " TEXT," +
                     COLUMN_GOAL_TYPE + " TEXT," +
                     COLUMN_GOAL_DURATION_IN_MINUTES + " INTEGER," +
-                    COLUMN_GOAL_DAYS + " TEXT," +
+                    COLUMN_GOAL_REPEAT_TYPE + " TEXT," +
+                    COLUMN_GOAL_REPEAT_PATTERN + " TEXT," +
                     COLUMN_GOAL_START_TIME + " TEXT," +
                     COLUMN_GOAL_END_TIME + " TEXT," +
+                    COLUMN_GOAL_SET_DATE + " TEXT," +
                     COLUMN_IS_GOAL_CURRENTLY_TRACKED + " INTEGER," +
                     COLUMN_IS_GOAL_DELETED + " INTEGER)";
 
@@ -137,7 +143,7 @@ public class GoalSQLiteHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_ACTIVITY_SAMPLES);
         db.execSQL(CREATE_GOALS_COMPLETION);
 
-        SeedDatabase(db);
+        //SeedDatabase(db);
         //db.execSQL(CREATE_ANNOTATIONS);
     }
 
@@ -160,9 +166,11 @@ public class GoalSQLiteHelper extends SQLiteOpenHelper {
             goalValues.put(COLUMN_GOAL_TITLE, goal.getGoalTitle());
             goalValues.put(COLUMN_GOAL_TYPE, goal.getGoalType());
             goalValues.put(COLUMN_GOAL_DURATION_IN_MINUTES, goal.getGoalDurationInMinutes());
-            goalValues.put(COLUMN_GOAL_DAYS, goal.getGoalDays());
+            goalValues.put(COLUMN_GOAL_REPEAT_TYPE, goal.getGoalRepeatType());
+            goalValues.put(COLUMN_GOAL_REPEAT_PATTERN, goal.getGoalRepeatPattern());
             goalValues.put(COLUMN_GOAL_START_TIME, goal.getGoalStartTime());
             goalValues.put(COLUMN_GOAL_END_TIME, goal.getGoalEndTime());
+            goalValues.put(COLUMN_GOAL_SET_DATE, goal.getGoalSetDate());
             goalValues.put(COLUMN_IS_GOAL_CURRENTLY_TRACKED, goal.getIsGoalCurrentlyTracked());
             goalValues.put(COLUMN_IS_GOAL_DELETED, goal.getIsGoalDeleted());
 
@@ -212,12 +220,15 @@ public class GoalSQLiteHelper extends SQLiteOpenHelper {
 
         ArrayList<Goal> dataList = new ArrayList<>();
 
+        String day1_str = CommonUtil.GetCurrentDateString();
+
+
         //Activity - 1
-        Goal goal_1 = new Goal(1, "Morning Jogging",ActivityType.jogging.toString(),20, "DAILY","07:00", "08:00", 1,0);
+        Goal goal_1 = new Goal(1, "Morning Jogging",ActivityType.jogging.toString(),20, "DAILY","", "07:00", "08:00",day1_str, 1,0);
         goal_1.setCompletedPercentage(70);
-        Goal goal_2 = new Goal(2, "Walking to Office",ActivityType.walking.toString(),10, "DAILY","09:00", "10:00", 1,0);
+        Goal goal_2 = new Goal(2, "Walking to Office",ActivityType.walking.toString(),10, "DAILY","","09:00", "10:00",day1_str, 1,0);
         goal_2.setCompletedPercentage(50);
-        Goal goal_3 = new Goal(3, "Use Stairs",ActivityType.staircase.toString(),10, "NEVER","10:00", "22:00", 1,0);
+        Goal goal_3 = new Goal(3, "Use Stairs",ActivityType.staircase.toString(),10, "NEVER", "","10:00", "22:00",day1_str, 1,0);
         goal_3.setCompletedPercentage(20);
         dataList.add(goal_1);
         dataList.add(goal_2);
@@ -269,7 +280,7 @@ public class GoalSQLiteHelper extends SQLiteOpenHelper {
         rand.setSeed(100);
 
         String[] activities = {"downstairs","jogging","sitting","upstairs","walking","unknown","standing"};
-        for (int i=0; i<1000; i++){
+        for (int i=0; i<5; i++){
             DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");  //ISO 8601 format
             int durationInMilliSecs = 5 *1000;
 

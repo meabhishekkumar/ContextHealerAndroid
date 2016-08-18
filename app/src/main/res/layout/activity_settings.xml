@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/rootLayout"
+                tools:context=".app.SettingsActivity">
+
+
+
+    <include
+        android:id="@+id/settingsPageToolbar"
+        layout="@layout/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"/>
+
+
+    <!--<android.support.v7.widget.Toolbar-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:id="@+id/view"-->
+    <!--android:layout_alignParentTop="true"-->
+    <!--android:layout_centerHorizontal="true"/>-->
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/settingsPageToolbar"
+        android:background="@android:color/transparent">
+        <!--Scrollable content here-->
+
+        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:layout_marginTop="5dp">
+
+
+            <!-- Enable Tracking -->
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent">
+
+                <ImageView
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_track_changes_white_36dp"
+                    android:tint="@color/grey_500"
+                    android:layout_column="1"
+                    android:layout_marginTop="16dp"/>
+
+                <LinearLayout android:orientation="vertical"
+                              android:layout_column="2"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:layout_gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/enable_tracking"
+                        android:layout_gravity="center_horizontal"
+                        android:textAppearance="?android:attr/textAppearanceSmallPopupMenu"
+                        />
+
+
+
+                </LinearLayout>
+
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/tvIsTrackingEnabledSettings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:button="@null"
+
+                    android:padding="2dp"
+                    android:checked="true"
+                    android:layout_column="3"
+                    android:layout_gravity="center"/>
+
+            </TableRow>
+
+
+            <!-- Enable Notification -->
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent">
+
+                <ImageView
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_notifications_active_white_36dp"
+                    android:tint="@color/grey_500"
+                    android:layout_column="1"
+                    android:layout_marginTop="16dp"/>
+
+                <LinearLayout android:orientation="vertical"
+                              android:layout_column="2"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:layout_gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/enable_notification"
+                        android:layout_gravity="center_horizontal"
+                        android:textAppearance="?android:attr/textAppearanceSmallPopupMenu"
+                        />
+
+
+
+                </LinearLayout>
+
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/tvIsNotificationEnabledSettings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:button="@null"
+
+                    android:padding="2dp"
+                    android:checked="true"
+                    android:layout_column="3"
+                    android:layout_gravity="center"/>
+
+            </TableRow>
+
+
+
+        </TableLayout>
+    </ScrollView>
+
+</RelativeLayout>

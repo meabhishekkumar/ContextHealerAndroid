@@ -5,8 +5,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import edu.berkeley.datascience.contextualhealer.R;
+import edu.berkeley.datascience.contextualhealer.utils.CommonUtil;
 
 public class Goal  implements Parcelable {
 //    ----------------------------------------------------------------------------
@@ -30,29 +32,34 @@ public class Goal  implements Parcelable {
     private String mGoalType;
     private int mGoalDurationInMinutes;
     private String mGoalDescription;
-    private String mGoalDays;
+    private String mGoalRepeatType;
+    private String mGoalRepeatPattern;
     private String mGoalStartTime;
     private String mGoalEndTime;
+    private String mGoalSetDate;
     private String mGoalStartEndCombinedString;
     private int mIsGoalCurrentlyTracked;
     private int mIsGoalDeleted;
     private int mCompletedDurationInMinutes;
-    private int CompletedPercentage;
+    private float CompletedPercentage;
     private int mGoalImageID;
+
 
 
     //Constructor
     public Goal(int goalID, String goalTitle, String goalType, int goalDurationInMinutes,
-                String goalDays, String goalStartTime,
-                String goalEndTime, int isGoalCurrentlyTracked, int isGoalDeleted){
+                String goalRepeatType, String goalRepeatPattern, String goalStartTime,
+                String goalEndTime, String goalSetDate, int isGoalCurrentlyTracked, int isGoalDeleted){
 
         mGoalID = goalID;
         mGoalTitle = goalTitle;
         mGoalType = goalType;
         mGoalDurationInMinutes = goalDurationInMinutes;
-        mGoalDays = goalDays;
+        mGoalRepeatType = goalRepeatType;
+        mGoalRepeatPattern = goalRepeatPattern;
         mGoalStartTime = goalStartTime;
         mGoalEndTime = goalEndTime;
+        mGoalSetDate = goalSetDate;
         mIsGoalCurrentlyTracked = isGoalCurrentlyTracked;
         mIsGoalDeleted = isGoalDeleted;
 
@@ -60,15 +67,17 @@ public class Goal  implements Parcelable {
 
     //Constructor
     public Goal(String goalTitle, String goalType, int goalDurationInMinutes,
-                String goalDays, String goalStartTime,
-                String goalEndTime, int isGoalCurrentlyTracked, int isGoalDeleted){
+                String goalRepeatType, String goalRepeatPattern, String goalStartTime,
+                String goalEndTime, String goalSetDate, int isGoalCurrentlyTracked, int isGoalDeleted){
 
         mGoalTitle = goalTitle;
         mGoalType = goalType;
         mGoalDurationInMinutes = goalDurationInMinutes;
-        mGoalDays = goalDays;
+        mGoalRepeatType = goalRepeatType;
+        mGoalRepeatPattern = goalRepeatPattern;
         mGoalStartTime = goalStartTime;
         mGoalEndTime = goalEndTime;
+        mGoalSetDate = goalSetDate;
         mIsGoalCurrentlyTracked = isGoalCurrentlyTracked;
         mIsGoalDeleted = isGoalDeleted;
 
@@ -103,6 +112,15 @@ public class Goal  implements Parcelable {
         return mGoalDurationInMinutes;
     }
 
+    public String getGoalRepeatPattern() { return mGoalRepeatPattern; }
+
+    public void setGoalRepeatPattern(String goalRepeatPattern) { mGoalRepeatPattern = goalRepeatPattern; }
+
+    public String getGoalRepeatType() { return mGoalRepeatType; }
+
+    public void setGoalRepeatType(String goalRepeatType) { mGoalRepeatType = goalRepeatType; }
+
+
     public void setGoalDurationInMinutes(int goalDurationInMinutes) {
         mGoalDurationInMinutes = goalDurationInMinutes;
     }
@@ -117,13 +135,7 @@ public class Goal  implements Parcelable {
 
 
 
-    public String getGoalDays() {
-        return mGoalDays;
-    }
 
-    public void setGoalDays(String goalDays) {
-        mGoalDays = goalDays;
-    }
 
     public String getGoalStartTime() {
         return mGoalStartTime;
@@ -140,6 +152,15 @@ public class Goal  implements Parcelable {
     public void setGoalEndTime(String goalEndTime) {
         mGoalEndTime = goalEndTime;
     }
+
+    public String getGoalSetDate() {
+        return mGoalSetDate;
+    }
+
+    public void setGoalSetDate(String goalSetDate) {
+        mGoalSetDate = goalSetDate;
+    }
+
 
     public String getGoalStartEndCombinedString() {
         return String.format("%s - %s", mGoalStartTime, mGoalEndTime);
@@ -173,11 +194,11 @@ public class Goal  implements Parcelable {
         mCompletedDurationInMinutes = completedDurationInMinutes;
     }
 
-    public int getCompletedPercentage() {
+    public float getCompletedPercentage() {
         return CompletedPercentage;
     }
 
-    public void setCompletedPercentage(int completedPercentage) {
+    public void setCompletedPercentage(float completedPercentage) {
         CompletedPercentage = completedPercentage;
     }
 
@@ -250,9 +271,11 @@ public class Goal  implements Parcelable {
         dest.writeString(mGoalTitle);
         dest.writeString(mGoalType);
         dest.writeInt(mGoalDurationInMinutes);
-        dest.writeString(mGoalDays);
+        dest.writeString(mGoalRepeatType);
+        dest.writeString(mGoalRepeatPattern);
         dest.writeString(mGoalStartTime);
         dest.writeString(mGoalEndTime);
+        dest.writeString(mGoalSetDate);
         dest.writeInt(mIsGoalCurrentlyTracked);
         dest.writeInt(mIsGoalDeleted);
     }
@@ -262,12 +285,97 @@ public class Goal  implements Parcelable {
         mGoalTitle = in.readString();
         mGoalType = in.readString();
         mGoalDurationInMinutes = in.readInt();
-        mGoalDays = in.readString();
+        mGoalRepeatType = in.readString();
+        mGoalRepeatPattern = in.readString();
         mGoalStartTime = in.readString();
         mGoalEndTime = in.readString();
+        mGoalSetDate = in.readString();
         mIsGoalCurrentlyTracked = in.readInt();
         mIsGoalDeleted = in.readInt();
     }
+
+
+    public Boolean IsGoalToBeUpdated() {
+        Boolean result = true;
+        if(mIsGoalCurrentlyTracked == 0){
+            //If the goal is not getting tracked : user has turned it off manually : then don't update
+            return false;
+        }
+
+        Date goalSetDate = CommonUtil.ParseDateString(mGoalSetDate);
+        Date startTimeStamp = CommonUtil.ParseTimeString(mGoalStartTime);
+        Date endTimeStamp = CommonUtil.ParseTimeString(mGoalEndTime);
+
+        //if the goal is set to be tracked. Then look at the repeat type
+        if(mGoalRepeatType == "NONE" ){
+            // if the date of goal creation is same as today : i.e. goal has been created today only : track it else leave it
+            if(CommonUtil.IsSameDay(goalSetDate, CommonUtil.GetCurrentDate())){
+                // if it is the same day then check if the current time is between goal start time and end time
+
+                result = CommonUtil.IsCurrentDateBetweenStartAndEnd(startTimeStamp, endTimeStamp);
+                return result;
+            }
+            else{
+                result = false;
+                return  result;
+            }
+        }
+
+        if(mGoalRepeatType == "DAILY"){
+            // if the repeat type is DAILY then simply check if the current time is between goal start and end time
+            result = CommonUtil.IsCurrentDateBetweenStartAndEnd(startTimeStamp, endTimeStamp);
+            return result;
+        }
+
+        if(mGoalRepeatType == "WEEKLY"){
+            // if the repeat type is Weekly, then check if the current day is same as the day of goal creation
+            if(CommonUtil.GetCurrentDayOfWeek() == CommonUtil.GetDayOfWeek(goalSetDate)){
+                //If yes, then simply check if the current time is between goal start and end time
+                result = CommonUtil.IsCurrentDateBetweenStartAndEnd(startTimeStamp, endTimeStamp);
+                return result;
+            }
+            else{
+                result = false;
+                return  result;
+            }
+        }
+
+        if(mGoalRepeatType == "MONTHLY"){
+            // if the repeat type is Monthly, then check if the current month is same as the day of goal creation
+            if(CommonUtil.GetCurrentDayOfMonth() == CommonUtil.GetDayOfMonth(goalSetDate)){
+                //If yes, then simply check if the current time is between goal start and end time
+                result = CommonUtil.IsCurrentDateBetweenStartAndEnd(startTimeStamp, endTimeStamp);
+                return result;
+            }
+            else{
+                result = false;
+                return  result;
+            }
+
+        }
+
+        if(mGoalRepeatType == "YEARLY"){
+            //Both Day of Month and Month should be same with that of goal creation
+            if(CommonUtil.GetCurrentDayOfMonth() == CommonUtil.GetDayOfMonth(goalSetDate)
+                    && CommonUtil.GetCurrentMonth() == CommonUtil.GetMonth(goalSetDate)){
+                //If yes, then simply check if the current time is between goal start and end time
+                result = CommonUtil.IsCurrentDateBetweenStartAndEnd(startTimeStamp, endTimeStamp);
+                return result;
+            }
+            else{
+                result = false;
+                return  result;
+            }
+
+        }
+
+        //TODO: WORK ON CUSTOM ONE
+
+        return  result;
+    }
+
+
+
 
     public static final Creator<Goal> CREATOR = new Creator<Goal>() {
         @Override

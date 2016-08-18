@@ -2,10 +2,24 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="edu.berkeley.datascience.contextualhealer">
 
-    <!-- To auto-complete the email text field in the login form with the user's emails -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.READ_PROFILE"/>
-    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+
+    <!-- User permission to run the application on the boot -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+
+    <!-- TO make sure the application is used only on smartphones not on tablets -->
+    <compatible-screens>
+        <!-- all small size screens -->
+        <screen android:screenSize="small" android:screenDensity="ldpi" />
+        <screen android:screenSize="small" android:screenDensity="mdpi" />
+        <screen android:screenSize="small" android:screenDensity="hdpi" />
+        <screen android:screenSize="small" android:screenDensity="xhdpi" />
+        <!-- all normal size screens -->
+        <screen android:screenSize="normal" android:screenDensity="ldpi" />
+        <screen android:screenSize="normal" android:screenDensity="mdpi" />
+        <screen android:screenSize="normal" android:screenDensity="hdpi" />
+        <screen android:screenSize="normal" android:screenDensity="xhdpi" />
+    </compatible-screens>
 
     <application
         android:allowBackup="true"
@@ -14,8 +28,7 @@
         android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/MaterialTheme">
-
-
+        <!-- Launch Screen -->
         <activity android:name=".app.SplashScreenActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -23,13 +36,19 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
         <activity android:name=".app.MainActivity"/>
         <activity android:name=".app.CreateGoalActivity"/>
-
+        <activity android:name=".app.SettingsActivity"/>
+        <activity android:name=".app.ContextualHealerSettingsActivity"/>
 
         <service android:name=".service.ContextRecognitionService"/>
 
+        <!-- Declaring broadcast receiver for BOOT_COMPLETED event. -->
+        <!--<receiver android:name=".service.ContextRecognitionBroadcastReceiver" android:enabled="true" android:exported="false">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.BOOT_COMPLETED"/>-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
 
     </application>
 

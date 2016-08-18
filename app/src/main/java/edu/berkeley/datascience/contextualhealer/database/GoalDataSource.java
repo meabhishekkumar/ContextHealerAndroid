@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 import java.util.ArrayList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import edu.berkeley.datascience.contextualhealer.R;
 import edu.berkeley.datascience.contextualhealer.activity.ActivityType;
@@ -14,11 +16,15 @@ import edu.berkeley.datascience.contextualhealer.model.ActivitySample;
 import edu.berkeley.datascience.contextualhealer.model.ActivitySummary;
 import edu.berkeley.datascience.contextualhealer.model.Goal;
 import edu.berkeley.datascience.contextualhealer.model.GoalCompletion;
+import edu.berkeley.datascience.contextualhealer.utils.CommonUtil;
 
 public class GoalDataSource {
 
     private Context mContext;
     private GoalSQLiteHelper mGoalSQLiteHelper;
+    private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
+    private final Lock r = rwl.readLock();
+    private final Lock w = rwl.writeLock();
 
     public GoalDataSource(Context context){
         mContext = context;
@@ -42,6 +48,7 @@ public class GoalDataSource {
         //return  getMockedActiveGoals();
 
 
+
         SQLiteDatabase database = open();
         Cursor cursor = database.query(
                 GoalSQLiteHelper.GOALS_TABLE,
@@ -49,9 +56,11 @@ public class GoalDataSource {
                         GoalSQLiteHelper.COLUMN_GOAL_TITLE,
                         GoalSQLiteHelper.COLUMN_GOAL_TYPE,
                         GoalSQLiteHelper.COLUMN_GOAL_DURATION_IN_MINUTES,
-                        GoalSQLiteHelper.COLUMN_GOAL_DAYS,
+                        GoalSQLiteHelper.COLUMN_GOAL_REPEAT_TYPE,
+                        GoalSQLiteHelper.COLUMN_GOAL_REPEAT_PATTERN,
                         GoalSQLiteHelper.COLUMN_GOAL_START_TIME,
                         GoalSQLiteHelper.COLUMN_GOAL_END_TIME,
+                        GoalSQLiteHelper.COLUMN_GOAL_SET_DATE,
                         GoalSQLiteHelper.COLUMN_IS_GOAL_CURRENTLY_TRACKED,
                         GoalSQLiteHelper.COLUMN_IS_GOAL_DELETED
                 },
@@ -68,14 +77,27 @@ public class GoalDataSource {
                         getStringFromColumnName(cursor, GoalSQLiteHelper.COLUMN_GOAL_TITLE),
                         getStringFromColumnName(cursor, GoalSQLiteHelper.COLUMN_GOAL_TYPE),
                         getIntFromColumnName(cursor, GoalSQLiteHelper.COLUMN_GOAL_DURATION_IN_MINUTES),
-                        getStringFromColumnName(cursor, GoalSQLiteHelper.COLUMN_GOAL_DAYS),
+                        getStringFromColumnName(cursor, GoalSQLiteHelper.COLUMN_GOAL_REPEAT_TYPE),
+                        getStringFromColumnName(cursor, GoalSQLiteHelper.COLUMN_GOAL_REPEAT_PATTERN),
                         getStringFromColumnName(cursor, GoalSQLiteHelper.COLUMN_GOAL_START_TIME),
                         getStringFromColumnName(cursor, GoalSQLiteHelper.COLUMN_GOAL_END_TIME),
+                        getStringFromColumnName(cursor, GoalSQLiteHelper.COLUMN_GOAL_SET_DATE),
                         getIntFromColumnName(cursor, GoalSQLiteHelper.COLUMN_IS_GOAL_CURRENTLY_TRACKED),
                         getIntFromColumnName(cursor, GoalSQLiteHelper.COLUMN_IS_GOAL_DELETED));
 
                 //TODO: WORK ON COMPLETION PERCENTAGE
-                goal.setCompletedPercentage(60);
+                //As per current GoalID and Current Date, the Completion Percentage
+
+                //goal.setCompletedPercentage(60);
+                String currentDate = CommonUtil.GetCurrentDateString();
+                GoalCompletion goalCompletionData = readGoalCompletionIDDateWise(GoalID, currentDate);
+                if (goalCompletionData == null) {
+                    goal.setCompletedPercentage(0.0f);
+                }
+                else{
+                    goal.setCompletedPercentage(CommonUtil.round(goalCompletionData.getGoalCompletionPercentage(),1));
+                }
+
                 activeGoals.add(goal);
 
             }while(cursor.moveToNext());
@@ -97,9 +119,11 @@ public class GoalDataSource {
         goalValues.put(GoalSQLiteHelper.COLUMN_GOAL_TITLE, goal.getGoalTitle());
         goalValues.put(GoalSQLiteHelper.COLUMN_GOAL_TYPE, goal.getGoalType());
         goalValues.put(GoalSQLiteHelper.COLUMN_GOAL_DURATION_IN_MINUTES, goal.getGoalDurationInMinutes());
-        goalValues.put(GoalSQLiteHelper.COLUMN_GOAL_DAYS, goal.getGoalDays());
+        goalValues.put(GoalSQLiteHelper.COLUMN_GOAL_REPEAT_TYPE, goal.getGoalRepeatType());
+        goalValues.put(GoalSQLiteHelper.COLUMN_GOAL_REPEAT_PATTERN, goal.getGoalRepeatPattern());
         goalValues.put(GoalSQLiteHelper.COLUMN_GOAL_START_TIME, goal.getGoalStartTime());
         goalValues.put(GoalSQLiteHelper.COLUMN_GOAL_END_TIME, goal.getGoalEndTime());
+        goalValues.put(GoalSQLiteHelper.COLUMN_GOAL_SET_DATE, goal.getGoalSetDate());
         goalValues.put(GoalSQLiteHelper.COLUMN_IS_GOAL_CURRENTLY_TRACKED, goal.getIsGoalCurrentlyTracked());
         goalValues.put(GoalSQLiteHelper.COLUMN_IS_GOAL_DELETED, goal.getIsGoalDeleted());
 
@@ -121,9 +145,11 @@ public class GoalDataSource {
         updateGoalValues.put(GoalSQLiteHelper.COLUMN_GOAL_TITLE, goal.getGoalTitle());
         updateGoalValues.put(GoalSQLiteHelper.COLUMN_GOAL_TYPE, goal.getGoalType());
         updateGoalValues.put(GoalSQLiteHelper.COLUMN_GOAL_DURATION_IN_MINUTES, goal.getGoalDurationInMinutes());
-        updateGoalValues.put(GoalSQLiteHelper.COLUMN_GOAL_DAYS, goal.getGoalDays());
+        updateGoalValues.put(GoalSQLiteHelper.COLUMN_GOAL_REPEAT_TYPE, goal.getGoalRepeatType());
+        updateGoalValues.put(GoalSQLiteHelper.COLUMN_GOAL_REPEAT_PATTERN, goal.getGoalRepeatPattern());
         updateGoalValues.put(GoalSQLiteHelper.COLUMN_GOAL_START_TIME, goal.getGoalStartTime());
         updateGoalValues.put(GoalSQLiteHelper.COLUMN_GOAL_END_TIME, goal.getGoalEndTime());
+        updateGoalValues.put(GoalSQLiteHelper.COLUMN_GOAL_SET_DATE, goal.getGoalSetDate());
         updateGoalValues.put(GoalSQLiteHelper.COLUMN_IS_GOAL_CURRENTLY_TRACKED, goal.getIsGoalCurrentlyTracked());
         updateGoalValues.put(GoalSQLiteHelper.COLUMN_IS_GOAL_DELETED, goal.getIsGoalDeleted());
         database.update(GoalSQLiteHelper.GOALS_TABLE,
@@ -263,8 +289,112 @@ public class GoalDataSource {
         return result;
     }
 
+    public boolean IsGoalCompletionRowInDB(GoalCompletion goalCompletion){
+        int goalCompletionCount = 0;
+        String query =  "SELECT count(*) Total_Count from "+ GoalSQLiteHelper.GOALS_COMPLETION_TABLE +
+                " WHERE " + GoalSQLiteHelper.COLUMN_COMPLETION_TABLE_GOAL_ID + " == " + goalCompletion.getGoalID() +
+                " AND " + GoalSQLiteHelper.COLUMN_COMPLETION_TABLE_GOAL_DATE + " LIKE '" + goalCompletion.getGoalDate() + "'";
+
+        SQLiteDatabase database = open();
+        Cursor cursor = database.rawQuery(query, null);
 
 
+        if(cursor.moveToFirst()){
+            do{
+                goalCompletionCount = getIntFromColumnName(cursor, "Total_Count");
+            }while(cursor.moveToNext());
+        }
+        cursor.close();
+        close(database);
+        return (goalCompletionCount > 0);
+    }
+
+    public GoalCompletion readGoalCompletionIDDateWise(int goalID, String goalDate){
+
+        int goalCompletionCount = 0;
+        String query =  "SELECT * from "+ GoalSQLiteHelper.GOALS_COMPLETION_TABLE +
+                " WHERE " + GoalSQLiteHelper.COLUMN_COMPLETION_TABLE_GOAL_ID + " == " + goalID +
+                " AND " + GoalSQLiteHelper.COLUMN_COMPLETION_TABLE_GOAL_DATE + " LIKE '" + goalDate + "'";
+
+        SQLiteDatabase database = open();
+        Cursor cursor = database.rawQuery(query, null);
+        GoalCompletion goalCompletion = null;
+
+        if(cursor.moveToFirst()){
+            do{
+                goalCompletion = new GoalCompletion(
+                  getIntFromColumnName(cursor, GoalSQLiteHelper.COLUMN_COMPLETION_TABLE_GOAL_ID),
+                        getStringFromColumnName(cursor,GoalSQLiteHelper.COLUMN_COMPLETION_TABLE_GOAL_DATE),
+                        getFloatFromColumnName(cursor, GoalSQLiteHelper.COLUMN_COMPLETION_TABLE_GOAL_COMPLETION_PERCENTAGE),
+                        getStringFromColumnName(cursor,GoalSQLiteHelper.COLUMN_COMPLETION_TABLE_GOAL_TYPE)
+                );
+
+            }while(cursor.moveToNext());
+        }
+        cursor.close();
+        close(database);
+        return goalCompletion;
+    }
+
+    //Update Operation
+    public void updateGoalCompletionPercentage(GoalCompletion goalCompletion){
+        SQLiteDatabase database = open();
+        database.beginTransaction();
+
+        ContentValues updateGoalCompletionValues = new ContentValues();
+
+        updateGoalCompletionValues.put(GoalSQLiteHelper.COLUMN_COMPLETION_TABLE_GOAL_COMPLETION_PERCENTAGE, goalCompletion.getGoalCompletionPercentage());
+
+        database.update(GoalSQLiteHelper.GOALS_COMPLETION_TABLE,
+                updateGoalCompletionValues,
+                String.format("%s=%d", BaseColumns._ID, goalCompletion.getGoalID()),null);
+
+        database.setTransactionSuccessful();
+        database.endTransaction();
+        close(database);
+    }
+
+
+
+
+    //Insert
+    public void insertActivitySample(ActivitySample sample){
+        SQLiteDatabase database = open();
+
+        database.beginTransaction();
+
+        ContentValues sampleValues = new ContentValues();
+        sampleValues.put(GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_START_TIME_STAMP, sample.getStartTimeStamp());
+        sampleValues.put(GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_END_TIME_STAMP, sample.getEndTimeStamp());
+        sampleValues.put(GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_DURATION_IN_MILLI_SECS, sample.getDurationInMilliSecs());
+        sampleValues.put(GoalSQLiteHelper.COLUMN_ACTIVITY_SAMPLES_ACTIVITY_TYPE,sample.getActivityType());
+
+        database.insert(GoalSQLiteHelper.ACTIVITY_SAMPLES_TABLE,null,sampleValues);
+
+        database.setTransactionSuccessful();
+        database.endTransaction();
+        close(database);
+    }
+
+
+    //Insert
+    public void insertGoalCompletion(GoalCompletion goalCompletion){
+        SQLiteDatabase database = open();
+
+        database.beginTransaction();
+
+        ContentValues sampleValues = new ContentValues();
+        sampleValues.put(GoalSQLiteHelper.COLUMN_COMPLETION_TABLE_GOAL_ID, goalCompletion.getGoalID());
+        sampleValues.put(GoalSQLiteHelper.COLUMN_COMPLETION_TABLE_GOAL_DATE, goalCompletion.getGoalDate());
+        sampleValues.put(GoalSQLiteHelper.COLUMN_COMPLETION_TABLE_GOAL_COMPLETION_PERCENTAGE, goalCompletion.getGoalCompletionPercentage());
+        sampleValues.put(GoalSQLiteHelper.COLUMN_COMPLETION_TABLE_GOAL_TYPE,goalCompletion.getGoalType());
+
+        database.insert(GoalSQLiteHelper.GOALS_COMPLETION_TABLE,null,sampleValues);
+
+        database.setTransactionSuccessful();
+        database.endTransaction();
+        close(database);
+    }
 
 
 
@@ -291,29 +421,29 @@ public class GoalDataSource {
 
 
     // Mocked Data
-    public static ArrayList<Goal> getMockedActiveGoals() {
-
-        ArrayList<Goal> dataList = new ArrayList<>();
-
-        //Activity - 1
-        Goal goal_1 = new Goal(1, "Morning Jogging",ActivityType.jogging.toString(),20, "MON,TUE,WED","07:00", "08:00", 1,0);
-        goal_1.setCompletedPercentage(70);
-
-        Goal goal_2 = new Goal(2, "Walking to Office",ActivityType.walking.toString(),10, "WED,FRI","09:00", "10:00", 1,0);
-        goal_2.setCompletedPercentage(50);
-
-
-        Goal goal_3 = new Goal(3, "Use Stairs",ActivityType.staircase.toString(),10, "SAT,SUN","10:00", "22:00", 1,0);
-        goal_3.setCompletedPercentage(20);
-
-
-        dataList.add(goal_1);
-        dataList.add(goal_2);
-        dataList.add(goal_3);
-
-
-
-        return dataList;
-    }
+//    public static ArrayList<Goal> getMockedActiveGoals() {
+//
+//        ArrayList<Goal> dataList = new ArrayList<>();
+//
+//        //Activity - 1
+//        Goal goal_1 = new Goal(1, "Morning Jogging",ActivityType.jogging.toString(),20, "MON,TUE,WED","07:00", "08:00", 1,0);
+//        goal_1.setCompletedPercentage(70);
+//
+//        Goal goal_2 = new Goal(2, "Walking to Office",ActivityType.walking.toString(),10, "WED,FRI","09:00", "10:00", 1,0);
+//        goal_2.setCompletedPercentage(50);
+//
+//
+//        Goal goal_3 = new Goal(3, "Use Stairs",ActivityType.staircase.toString(),10, "SAT,SUN","10:00", "22:00", 1,0);
+//        goal_3.setCompletedPercentage(20);
+//
+//
+//        dataList.add(goal_1);
+//        dataList.add(goal_2);
+//        dataList.add(goal_3);
+//
+//
+//
+//        return dataList;
+//    }
 
 }

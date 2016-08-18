@@ -45,14 +45,15 @@ public class NavigationDrawerItem {
 	private static int[] getImages() {
 
 		return new int[]{
-							R.drawable.selector_icon_target, R.drawable.selector_icon_graph,
-							R.drawable.selector_icon_activity_trend, R.drawable.selector_icon_current_activity};
+							R.drawable.selector_icon_target,R.drawable.selector_icon_activity_trend, R.drawable.selector_icon_graph,
+							 R.drawable.selector_icon_current_activity, R.drawable.ic_settings_white_36dp};
 	}
 
 	private static String[] getTitles() {
 
+		//TODO : Set Settings
 		return new String[] {
-				"Active Goals", "Graph", "Report", "Current Activity"
+				"Goals", "Activity Trend", "Goal Report", "Current Activity", "Settings"
 		};
 	}
 }

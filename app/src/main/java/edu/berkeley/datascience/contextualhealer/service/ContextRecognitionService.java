@@ -1,6 +1,7 @@
 package edu.berkeley.datascience.contextualhealer.service;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -17,7 +18,10 @@ import android.util.Log;
 
 import org.apache.commons.lang3.SerializationUtils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import edu.berkeley.datascience.contextualhealer.R;
@@ -25,8 +29,14 @@ import edu.berkeley.datascience.contextualhealer.activity.ActivityDetector;
 import edu.berkeley.datascience.contextualhealer.activity.ActivityType;
 import edu.berkeley.datascience.contextualhealer.activity.OnDevicePredictor;
 import edu.berkeley.datascience.contextualhealer.app.MainActivity;
+import edu.berkeley.datascience.contextualhealer.app.SettingsActivity;
+import edu.berkeley.datascience.contextualhealer.database.GoalDataSource;
 import edu.berkeley.datascience.contextualhealer.interfaces.IPredictor;
+import edu.berkeley.datascience.contextualhealer.model.ActivitySample;
+import edu.berkeley.datascience.contextualhealer.model.Goal;
+import edu.berkeley.datascience.contextualhealer.model.GoalCompletion;
 import edu.berkeley.datascience.contextualhealer.model.PredictionSample;
+import edu.berkeley.datascience.contextualhealer.utils.CommonUtil;
 
 public class ContextRecognitionService extends Service implements SensorEventListener {
 
@@ -35,6 +45,7 @@ public class ContextRecognitionService extends Service implements SensorEventLis
     public static final String NOTIFY_ACTIVITY_CHANGE = "NOTIFY_ACTIVITY_CHANGE";
     public static final String NOTIFY_CURRENT_ACTIVITY = "NOTIFY_CURRENT_ACTIVITY";
     private static final int REQUEST_OPEN = 99; // To open the activity from notification bar
+    private static final int NOTIFY_SERVICE_STATE = 11;
     private IBinder mBinder = new LocalBinder();
     private Boolean mBackgroundServiceRunning = false;  // Boolean to check if the background service is running
     private Boolean mTrackSensorChange = true; // whether the sensor is tracked or not
@@ -59,6 +70,9 @@ public class ContextRecognitionService extends Service implements SensorEventLis
     private float AccelerometerZ;
     private long StartTime;
     private long EndTime;
+
+
+    private Context mContext;
 
 
     // Setters and Getters
@@ -119,18 +133,18 @@ public class ContextRecognitionService extends Service implements SensorEventLis
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         //TODO : Work on the Notification Builder
-        Intent mainIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, REQUEST_OPEN, mainIntent, 0);
-
-        Notification.Builder notificationBuilder = new Notification.Builder(this)
-                            .setSmallIcon(R.mipmap.ic_launcher)
-                            .setContentTitle("GoalTick")
-                            .setContentText("Click to stop tracking your goals.")
-                            .setContentIntent(pendingIntent);
-
-        //notificationBuilder.setAutoCancel(true);
-        Notification notification = notificationBuilder.build();
-        startForeground(11, notification);
+//        Intent mainIntent = new Intent(this, MainActivity.class);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this, REQUEST_OPEN, mainIntent, 0);
+//
+//        Notification.Builder notificationBuilder = new Notification.Builder(this)
+//                            .setSmallIcon(R.mipmap.ic_launcher)
+//                            .setContentTitle("GoalTick")
+//                            .setContentText("Click to stop tracking your goals.")
+//                            .setContentIntent(pendingIntent);
+//
+//        //notificationBuilder.setAutoCancel(true);
+//        Notification notification = notificationBuilder.build();
+//        startForeground(11, notification);
         // TODO: Check on other options for STICK attribute
         return Service.START_NOT_STICKY;
     }
@@ -161,11 +175,29 @@ public class ContextRecognitionService extends Service implements SensorEventLis
     }
     //Client (other Activities)
     public void startTracking(){
+        Intent mainIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, REQUEST_OPEN, mainIntent, 0);
+
+        Notification.Builder notificationBuilder = new Notification.Builder(this)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("GoalTick")
+                .setAutoCancel(false)
+                .setContentText("Click to stop tracking your goals.")
+                .setContentIntent(pendingIntent);
+
+        //notificationBuilder.setAutoCancel(true);
+        Notification notification = notificationBuilder.build();
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(NOTIFY_SERVICE_STATE, notification);
+        //startForeground(11, notification);
         Log.v(TAG, "Goal Tracking Started.");
         mBackgroundServiceRunning = true;
     }
 
     public void pauseTracking(){
+        String ns = Context.NOTIFICATION_SERVICE;
+        NotificationManager mNotificationManager = (NotificationManager) getApplicationContext().getSystemService(ns);
+        mNotificationManager.cancel(NOTIFY_SERVICE_STATE);
         Log.v(TAG, "Goal Tracking Paused.");
         mBackgroundServiceRunning = false;
     }
@@ -279,40 +311,104 @@ public class ContextRecognitionService extends Service implements SensorEventLis
     private String PredictActivity(PredictionSample sample){
 
         if(sample != null && sample.Count() > 0 ){
-            //Log.v(TAG, "Sample Count : " +  sample.Count() + " Current Activity :" + currentActivity.toString());
-            currentActivity = mPredictor.GetActivity(mActivityDetector, sample.GetSample2());
-        }
-        Log.v(TAG, "Start: " + sample.getM_SampleStartTime() + "  End : " + sample.getM_SampleEndTime() + " Count : " +  sample.Count() + " Activity :" + currentActivity.toString());
-        return currentActivity.toString();
-        //TODO : Save to the Database
+            ActivityType activity = mPredictor.GetActivity(mActivityDetector, sample.GetSample2());
 
-//
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                mResultText.setText("Output: " + currentActivity.toString());
-//
-//                switch (currentActivity.toString().toLowerCase()) {
-//                    case "downstairs":  mActivityImageView.setImageResource(R.drawable.downstairs);
-//                        break;
-//                    case "jogging":   mActivityImageView.setImageResource(R.drawable.jogging);
-//                        break;
-//                    case "sitting":   mActivityImageView.setImageResource(R.drawable.sitting);
-//                        break;
-//                    case "standing":   mActivityImageView.setImageResource(R.drawable.standing);
-//                        break;
-//                    case "upstairs":  mActivityImageView.setImageResource(R.drawable.upstairs);
-//                        break;
-//                    case "walking":   mActivityImageView.setImageResource(R.drawable.walking);
-//                        break;
-//                    default:  mActivityImageView.setImageResource(R.drawable.unknown);
-//                        break;
-//                }
-//
-//            }
-//        });
+            // Save to Activity Sample Database
+            SaveActivitySampleToDb(sample,activity);
+            UpdateGoalCompletion(sample, activity);
+            Log.v(TAG, "Start: " + sample.getM_SampleStartTime() + "  End : " + sample.getM_SampleEndTime() + " Count : " +  sample.Count() + " Activity :" + activity.toString());
+
+        }
+
+        return currentActivity.toString();
+    }
+
+    private void UpdateGoalCompletion(PredictionSample sample, ActivityType activity) {
+        //Based on the goals set: update the database
+
+        //Get all the goals
+        GoalDataSource datasource = new GoalDataSource(getApplicationContext());
+        ArrayList<Goal> goals = datasource.readActiveGoals();
+
+        //Iterate with all goals
+        for(Goal goal: goals){
+            Log.v("UPDATE_DB", "current goal " + goal.getGoalTitle());
+            Log.v("UPDATE_DB", CommonUtil.IsActivityTypeSameAsGoalType(goal.getGoalType(), activity.toString()) + " ");
+            Log.v("UPDATE_DB", goal.IsGoalToBeUpdated() + " ");
+            //Check if the goal will be updated or not
+            // if the activity type and goal type is not same then dont need to do anything
+            // if they are the same then check if the goal timing is suited to update or not
+            if(CommonUtil.IsActivityTypeSameAsGoalType(goal.getGoalType(), activity.toString()) && goal.IsGoalToBeUpdated()){
+                int goalID = goal.getGoalID();
+                Log.v("UPDATE_DB", "Is To be Updated or inserted ");
+                String currentDate = CommonUtil.GetCurrentDateString();
+                float completionPercentage = 0.0f;
+                if(goal.getGoalDurationInMinutes() > 0.0f){
+                    completionPercentage = SensorBlockInSeconds / (goal.getGoalDurationInMinutes() * 60);
+                }
+
+                String goalType = goal.getGoalType();
+                GoalCompletion existingGoalCompletionRow = datasource.readGoalCompletionIDDateWise(goalID, currentDate);
+                if(existingGoalCompletionRow != null){
+                    //Update the completion percentage if completion percentage for (GOAL_ID, GOAL_DATE) pair is already available in the databse
+                    //Add the existing the completion percentage with new
+                    completionPercentage = existingGoalCompletionRow.getGoalCompletionPercentage() + completionPercentage;
+                    if(completionPercentage < 100.0){
+
+                        Log.v("UPDATE_DB", "Updated...");
+
+                        // if completion exceeds 100 then do nothing, else update the value
+                        GoalCompletion goalCompletion = new GoalCompletion(goalID, currentDate, completionPercentage, goalType);
+                        datasource.updateGoalCompletionPercentage(goalCompletion);
+
+
+                    }
+
+                }
+                else{
+                    //Insert the new completion percentage
+                    Log.v("UPDATE_DB", "inserted ");
+                    GoalCompletion goalCompletion = new GoalCompletion(goalID, currentDate, completionPercentage, goalType);
+                    datasource.insertGoalCompletion(goalCompletion);
+                }
+
+
+            }
+        }
+
+
 
     }
+
+
+
+    private  void SaveActivitySampleToDb(PredictionSample predictionSample, ActivityType activityType){
+
+        //Prepare Data to insert
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");  //ISO 8601 format
+        int durationInMilliSecs = SensorBlockInSeconds *1000;
+
+        Date startTimestamp = new Date(predictionSample.getM_SampleStartTime());
+        String start = formatter.format(startTimestamp);
+
+        Date endTimestamp = new Date(predictionSample.getM_SampleEndTime());
+        String end = formatter.format(endTimestamp);
+        String currentActivity = activityType.toString();
+
+        ActivitySample activitySample = new ActivitySample();
+        activitySample.setStartTimeStamp(start);
+        activitySample.setEndTimeStamp(end);
+        activitySample.setActivityType(currentActivity);
+        activitySample.setDurationInMilliSecs(durationInMilliSecs);
+
+
+        //Save Activity Sample to the Database
+        GoalDataSource dataSource = new GoalDataSource(getApplicationContext());
+        dataSource.insertActivitySample(activitySample);
+
+    }
+
+
 
 
     @Override

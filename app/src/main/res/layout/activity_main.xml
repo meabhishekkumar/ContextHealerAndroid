@@ -48,6 +48,31 @@
         app:tabMode="fixed"
         android:background="@color/colorPrimary"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="right"   android:background="@color/colorPrimary">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:text="Enable goal tracking " android:layout_marginBottom="5dp" android:layout_marginTop="5dp" android:textColor="@android:color/white" android:layout_marginLeft="20dp" android:layout_gravity="center_vertical" android:gravity="left"/>
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/chkContextService"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:button="@null"
+            android:padding="2dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginBottom="5dp" android:layout_marginTop="5dp"
+            android:checked="false" android:layout_gravity="center_vertical" android:gravity="right"/>
+
+
+    </LinearLayout>
+
+
+
+
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
         android:layout_width="match_parent"

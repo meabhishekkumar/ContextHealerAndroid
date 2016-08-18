@@ -48,4 +48,82 @@
     <string name="enable_tracking">Enable tracking </string>
     <string name="enable_notification">Send reminders if missing goal</string>
     <string name="enable_share">Share to your network on success</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_social_recommendations">Enable social recommendations</string>
+    <string name="pref_description_social_recommendations">Recommendations for people to contact
+        based on your message history
+    </string>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+    <string-array name="pref_example_list_titles">
+        <item>Always</item>
+        <item>When possible</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="pref_header_notifications">Notifications</string>
+
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="key_enable_tracking">SETTINGS_ENABLE_TRACKING</string>
+    <string name="title_enable_tracking">Enable goal tracking</string>
+    <string name="key_tracking_mode">TRACKING_MODE</string>
+    <string name="title_tracking_mode">Activity prediction mode</string>
+    <string name="dialog_tracking_mode">Select activity prediction mode</string>
+    <string name="default_tracking_mode">TRACKING_LOCAL</string>
+    <string name="pref_title_application_version">1.0</string>
+    <string name="enable_data_stream">ENABLE_DATA_STREAM</string>
+    <string name="pref_enable_data_stream_summary">Send your smartphone sensor data to server for model tuning. No personal identifiers are sent to the server.</string>
+    <string name="pref_enable_data_stream_title">Send usage data</string>
+    <string name="enable_auto_model_update">ENABLE_AUTO_MODEL_UPDATE</string>
+    <string name="pref_enable_auto_model_update_summary">Get updated model on your device on regular basis for more accurate predictions. Internet will be used.</string>
+    <string name="pref_enable_auto_model_update_title">Update activity local prediction model</string>
+    <string name="enable_notification_on_goal_miss">ENABLE_NOTIFICATION_ON_GOAL_MISS</string>
+    <string name="pref_enable_notification_on_goal_miss_summary">Send push notifications if you are missing your goals</string>
+    <string name="pref_notification_on_goal_miss_title">Send notifications for missing goals</string>
+    <string name="enable_motivational_quotes">ENABLE_MOTIVATIONAL_QUOTES</string>
+    <string name="pref_enable_motivational_quotes_summary">Send push notifications for motivational quotes to keep you on track</string>
+    <string name="pref_motivational_quotes_title">Send motivational quotes</string>
 </resources>

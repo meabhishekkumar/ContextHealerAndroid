@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" android:title="General" android:theme="@style/Theme.AppCompat.NoActionBar">
+
+    <ListPreference  android:key="@string/key_tracking_mode"
+                    android:title="@string/title_tracking_mode"
+                    android:dialogTitle="@string/dialog_tracking_mode"
+        android:entries="@array/trackingModeEntries" android:entryValues="@array/trackingModeValueEntries"
+        android:defaultValue="@string/default_tracking_mode"  android:summary="%s" />
+
+    <SwitchPreference
+        android:key="@string/enable_data_stream"
+        android:summary="@string/pref_enable_data_stream_summary"
+        android:title="@string/pref_enable_data_stream_title"
+        android:defaultValue="false"/>
+
+    <SwitchPreference
+        android:key="@string/enable_auto_model_update"
+        android:summary="@string/pref_enable_auto_model_update_summary"
+        android:title="@string/pref_enable_auto_model_update_title"
+        android:defaultValue="true"/>
+
+    <!--<SwitchPreference android:key="@string/key_enable_tracking"-->
+                      <!--android:title="@string/title_enable_tracking"-->
+        <!--/>-->
+
+    <!--<PreferenceScreen-->
+        <!--android:theme="@style/Theme.AppCompat.NoActionBar"-->
+        <!--android:title="App">-->
+        <!--<PreferenceCategory android:title="Application">-->
+            <!--<Preference-->
+                <!--android:key="application_version"-->
+                <!--android:title="@string/pref_title_application_version" />-->
+        <!--</PreferenceCategory>-->
+    <!--</PreferenceScreen>-->
+
+
+    <!--<PreferenceScreen android:title="Notifications">-->
+
+        <!--<SwitchPreference-->
+            <!--android:key="@string/enable_notification_on_goal_miss"-->
+            <!--android:summary="@string/pref_enable_notification_on_goal_miss_summary"-->
+            <!--android:title="@string/pref_notification_on_goal_miss_title"-->
+            <!--android:defaultValue="true"/>-->
+
+        <!--<SwitchPreference-->
+            <!--android:key="@string/enable_motivational_quotes"-->
+            <!--android:summary="@string/pref_enable_motivational_quotes_summary"-->
+            <!--android:title="@string/pref_motivational_quotes_title"-->
+            <!--android:defaultValue="true"/>-->
+    <!--</PreferenceScreen>-->
+</PreferenceScreen>
+

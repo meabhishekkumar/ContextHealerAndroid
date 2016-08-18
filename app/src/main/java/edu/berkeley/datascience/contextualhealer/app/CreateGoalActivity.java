@@ -33,6 +33,8 @@ import edu.berkeley.datascience.contextualhealer.activity.ActivityType;
 import edu.berkeley.datascience.contextualhealer.database.GoalDataSource;
 import edu.berkeley.datascience.contextualhealer.fragment.SublimePickerFragment;
 import edu.berkeley.datascience.contextualhealer.model.Goal;
+import edu.berkeley.datascience.contextualhealer.utils.CommonUtil;
+import info.hoang8f.android.segmented.SegmentedGroup;
 
 public class CreateGoalActivity extends AppCompatActivity{
 
@@ -51,6 +53,7 @@ public class CreateGoalActivity extends AppCompatActivity{
     private Calendar mEndCalender;
     private int CalendarHour, CalendarMinute;
     private RadioButton chkActivityJogging, chkActivityWalking, chkActivityStaircase;
+    private SegmentedGroup mSelectActivityType;
     private SwitchCompat tvIsTrackingEnabled;
     private TextView txtDurationInMinutes;
     private String startTime, endTime;
@@ -102,6 +105,7 @@ public class CreateGoalActivity extends AppCompatActivity{
         chkActivityStaircase = (RadioButton) findViewById(R.id.chkActivityStaircase);
         tvIsTrackingEnabled = (SwitchCompat) findViewById(R.id.tvIsTrackingEnabled);
         txtDurationInMinutes = (TextView) findViewById(R.id.txtDurationInMinutes);
+        mSelectActivityType = (SegmentedGroup) findViewById(R.id.selectActivityType);
 
         //Initialize
         calendar = Calendar.getInstance();
@@ -121,7 +125,8 @@ public class CreateGoalActivity extends AppCompatActivity{
             txtStartTime.setText(goal.getGoalStartTime());
             txtEndTime.setText(goal.getGoalEndTime());
             txtDurationInMinutes.setText(String.valueOf(goal.getGoalDurationInMinutes()));
-            txtRepeatEvent.setText(goal.getGoalDays());
+            txtRepeatEvent.setText(goal.getGoalRepeatType());
+            txtRepeatCustomRule.setText(goal.getGoalRepeatPattern());
 
             switch (goal.getGoalType()){
                case "jogging":
@@ -139,6 +144,14 @@ public class CreateGoalActivity extends AppCompatActivity{
                     chkActivityJogging.setChecked(true);
 
             }
+
+            chkActivityJogging.setEnabled(false);
+            chkActivityWalking.setEnabled(false);
+            chkActivityStaircase.setEnabled(false);
+            mSelectActivityType.setTintColor(R.color.calendar_disabled_text_color_dark, R.color.mdtp_white);
+
+
+
             if(goal.getIsGoalCurrentlyTracked() == 1){
                 tvIsTrackingEnabled.setChecked(true);
             }
@@ -218,11 +231,15 @@ public class CreateGoalActivity extends AppCompatActivity{
 
 
                     //Repeat
-                    String repeat = txtRepeatEvent.getText().toString() + " " + txtRepeatCustomRule.getText().toString();
+                    String repeatType = txtRepeatEvent.getText().toString();
+                    String repeatPattern = txtRepeatCustomRule.getText().toString();
                     //Start Time
                     String startTime = txtStartTime.getText().toString();
                     //End Time
                     String endTime = txtEndTime.getText().toString();
+                    //Goal Set Date
+                    String goalSetDate = CommonUtil.GetCurrentDateString();
+
 
                     //IsTrackingEnabled
                     int isTrackingEnabled = 1;
@@ -236,15 +253,16 @@ public class CreateGoalActivity extends AppCompatActivity{
 
                     GoalDataSource dataSource = new GoalDataSource(CreateGoalActivity.this);
 
+
                     Log.v(TAG, "IsNewGoal : " + IsNewGoal);
                     if(IsNewGoal){
                         //Create new
-                        Goal goal = new Goal(goalTitle, activityType,duration, repeat ,startTime, endTime, isTrackingEnabled,0);
+                        Goal goal = new Goal(goalTitle, activityType,duration, repeatType,repeatPattern ,startTime, endTime,goalSetDate, isTrackingEnabled,0);
                         dataSource.create(goal);
                     }
                     else{
                         //Update
-                        Goal goal = new Goal(mCurrentGoalID, goalTitle, activityType,duration, repeat ,startTime, endTime, isTrackingEnabled,0);
+                        Goal goal = new Goal(mCurrentGoalID, goalTitle, activityType,duration, repeatType, repeatPattern ,startTime, endTime,goalSetDate, isTrackingEnabled,0);
                         dataSource.update(goal);
                     }
 
@@ -330,6 +348,8 @@ public class CreateGoalActivity extends AppCompatActivity{
                 case "DAILY":
                     repeat = "DAILY";
                     break;
+                case "WEEKLY":
+                    repeat = "WEEKLY";
                 case "MONTHLY":
                     repeat = "MONTHLY";
                     break;
@@ -337,8 +357,10 @@ public class CreateGoalActivity extends AppCompatActivity{
                     repeat = "YEARLY";
                     break;
                 case "CUSTOM":
-                    repeat = "CUSTOM";
-                    repeatCustomRule = mRecurrenceRule;
+                    //TODO : WORK ON CUSTOM REPEAT : Till then Set it to DAILY
+                    repeat = "DAILY";
+                    //repeat = "CUSTOM";
+                    //repeatCustomRule = mRecurrenceRule;
                     break;
                 default:
                     repeat = "NEVER";

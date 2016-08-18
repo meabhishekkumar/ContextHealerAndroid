@@ -312,8 +312,7 @@
                         android:orientation="horizontal"
                         segmentedgroup:sc_border_width="2dp"
                         segmentedgroup:sc_corner_radius="1dp"
-                        segmentedgroup:sc_tint_color="@color/colorAccent"
-                        >
+                        segmentedgroup:sc_tint_color="@color/colorAccent">
 
                         <RadioButton
                             android:id="@+id/chkActivityJogging"

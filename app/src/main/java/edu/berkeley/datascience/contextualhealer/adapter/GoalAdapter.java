@@ -93,7 +93,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
 			this.imgThumb.setImageResource(current.getGoalImageID());
 			this.position = position;
 			this.current = current;
-			this.progressBar.setProgress(current.getCompletedPercentage());
+			this.progressBar.setProgress((int)current.getCompletedPercentage());
 			this.timeInterval.setText(current.getGoalStartEndCombinedString());
 			this.progressBarDescription.setText(current.getCompletedPercentage() + " % Completed");
 			if(current.getIsGoalCurrentlyTracked() == 1){
