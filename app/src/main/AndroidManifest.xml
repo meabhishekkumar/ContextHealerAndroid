@@ -8,18 +8,18 @@
 
 
     <!-- TO make sure the application is used only on smartphones not on tablets -->
-    <compatible-screens>
-        <!-- all small size screens -->
-        <screen android:screenSize="small" android:screenDensity="ldpi" />
-        <screen android:screenSize="small" android:screenDensity="mdpi" />
-        <screen android:screenSize="small" android:screenDensity="hdpi" />
-        <screen android:screenSize="small" android:screenDensity="xhdpi" />
-        <!-- all normal size screens -->
-        <screen android:screenSize="normal" android:screenDensity="ldpi" />
-        <screen android:screenSize="normal" android:screenDensity="mdpi" />
-        <screen android:screenSize="normal" android:screenDensity="hdpi" />
-        <screen android:screenSize="normal" android:screenDensity="xhdpi" />
-    </compatible-screens>
+    <!--<compatible-screens>-->
+        <!--&lt;!&ndash; all small size screens &ndash;&gt;-->
+        <!--<screen android:screenSize="small" android:screenDensity="ldpi" />-->
+        <!--<screen android:screenSize="small" android:screenDensity="mdpi" />-->
+        <!--<screen android:screenSize="small" android:screenDensity="hdpi" />-->
+        <!--<screen android:screenSize="small" android:screenDensity="xhdpi" />-->
+        <!--&lt;!&ndash; all normal size screens &ndash;&gt;-->
+        <!--<screen android:screenSize="normal" android:screenDensity="ldpi" />-->
+        <!--<screen android:screenSize="normal" android:screenDensity="mdpi" />-->
+        <!--<screen android:screenSize="normal" android:screenDensity="hdpi" />-->
+        <!--<screen android:screenSize="normal" android:screenDensity="xhdpi" />-->
+    <!--</compatible-screens>-->
 
     <application
         android:allowBackup="true"
@@ -48,6 +48,7 @@
                   android:screenOrientation="portrait"/>
 
         <service android:name=".service.ContextRecognitionService"/>
+        <service android:name=".service.ContextRecognitionServiceNew"/>
 
         <!-- Declaring broadcast receiver for BOOT_COMPLETED event. -->
         <!--<receiver android:name=".service.ContextRecognitionBroadcastReceiver" android:enabled="true" android:exported="false">-->

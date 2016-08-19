@@ -57,7 +57,7 @@
 
                         <TextView
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content" android:textColor="@android:color/white" android:layout_marginTop="5dp"  android:text="Goals Completed" />
+                            android:layout_height="wrap_content" android:textColor="@android:color/white" android:layout_marginTop="5dp"  android:text="Goals tracked" />
                     </LinearLayout>
 
 
@@ -78,7 +78,7 @@
                         android:layout_marginRight="16dp"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
-                        android:src="@drawable/ic_access_alarm_white_36dp"
+                        android:src="@drawable/target_white"
                         android:layout_column="1"
                         android:layout_marginTop="16dp"/>
 
@@ -92,7 +92,7 @@
 
                         <TextView
                             android:layout_width="match_parent" android:layout_marginTop="5dp"
-                            android:layout_height="wrap_content" android:textColor="@android:color/white"  android:text="Average Completion" />
+                            android:layout_height="wrap_content" android:textColor="@android:color/white"  android:text="Average completion" />
                     </LinearLayout>
 
 

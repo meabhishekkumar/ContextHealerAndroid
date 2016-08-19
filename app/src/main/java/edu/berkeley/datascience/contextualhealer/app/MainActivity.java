@@ -31,6 +31,7 @@ import edu.berkeley.datascience.contextualhealer.fragment.fragmentActivityTrend;
 import edu.berkeley.datascience.contextualhealer.fragment.fragmentCurrentActivityTimeLine;
 import edu.berkeley.datascience.contextualhealer.R;
 import edu.berkeley.datascience.contextualhealer.service.ContextRecognitionService;
+import edu.berkeley.datascience.contextualhealer.service.ContextRecognitionServiceNew;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Button mBtnServiceStatus;
     private Boolean mBound = false;
-    private ContextRecognitionService mContextRecognitionService;
+    private ContextRecognitionServiceNew mContextRecognitionService;
     private SwitchCompat mchkContextService;
     private Context mContext;
 
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName name, IBinder binder) {
             Log.v(TAG, "On Service Connected");
             mBound = true;
-            ContextRecognitionService.LocalBinder localBinder = (ContextRecognitionService.LocalBinder) binder;
+            ContextRecognitionServiceNew.LocalBinder localBinder = (ContextRecognitionServiceNew.LocalBinder) binder;
             mContextRecognitionService = localBinder.getService();
             if(mContextRecognitionService.isTracking()){
                 mchkContextService.setChecked(true);
@@ -135,7 +136,8 @@ public class MainActivity extends AppCompatActivity {
                         ContextualHealerApplicationSettings settings = new ContextualHealerApplicationSettings(MainActivity.this);
                         settings.setEnableTrackingPreference(1);
 
-                        Intent intent = new Intent(MainActivity.this,  ContextRecognitionService.class);
+                        //Intent intent = new Intent(MainActivity.this,  ContextRecognitionService.class);
+                        Intent intent = new Intent(MainActivity.this,  ContextRecognitionServiceNew.class);
                         startService(intent);
                         mContextRecognitionService.startTracking();
                         mchkContextService.setChecked(true);
@@ -159,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         Log.v(TAG, "On Start of fragment");
-        Intent intent = new Intent(this, ContextRecognitionService.class);
+        Intent intent = new Intent(this, ContextRecognitionServiceNew.class);
         bindService(intent,mServiceConnection, Context.BIND_AUTO_CREATE);
         super.onStart();
     }

@@ -11,6 +11,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
@@ -23,8 +24,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import edu.berkeley.datascience.contextualhealer.R;
 import edu.berkeley.datascience.contextualhealer.activity.ActivityDetector;
@@ -34,7 +33,10 @@ import edu.berkeley.datascience.contextualhealer.app.MainActivity;
 import edu.berkeley.datascience.contextualhealer.database.GoalDataSource;
 import edu.berkeley.datascience.contextualhealer.interfaces.IPredictor;
 import edu.berkeley.datascience.contextualhealer.model.ActivitySample;
+import edu.berkeley.datascience.contextualhealer.model.Goal;
+import edu.berkeley.datascience.contextualhealer.model.GoalCompletion;
 import edu.berkeley.datascience.contextualhealer.model.PredictionSample;
+import edu.berkeley.datascience.contextualhealer.utils.CommonUtil;
 
 public class ContextRecognitionServiceNew extends Service implements SensorEventListener {
 
@@ -43,13 +45,14 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
     public static final String NOTIFY_ACTIVITY_CHANGE = "NOTIFY_ACTIVITY_CHANGE";
     public static final String NOTIFY_CURRENT_ACTIVITY = "NOTIFY_CURRENT_ACTIVITY";
     private static final int REQUEST_OPEN = 99; // To open the activity from notification bar
+    private static final int NOTIFY_SERVICE_STATE = 11;
     private IBinder mBinder = new LocalBinder();
     private Boolean mBackgroundServiceRunning = false;  // Boolean to check if the background service is running
     private Boolean mTrackSensorChange = true; // whether the sensor is tracked or not
-    private int mSamplesBatchSize = 1; // How many samples to be predicted in one batch
+    private int mSamplesBatchSize = 12; // How many samples to be predicted in one batch
     private int SensorBlockInSeconds = 5; // Each sample will contain how many seconds sample
-    private int TimerIntervalInMilliSeconds = 50;  // Retrieve data at each 50 milisecond
-    private PredictionSample mPredictionSample; // One Prediction Sample
+    private int FrequencyOfSensorDataCollectionInMilliSeconds = 50; // sensor values will be collected at 50 ms interval
+    private PredictionSample mPredictionSample = null; // One Prediction Sample
     private ArrayList<PredictionSample> mPredictionSamples; // List of samples
     private ActivityDetector mActivityDetector = new ActivityDetector(); // Activity Detector
     private IPredictor mPredictor = new OnDevicePredictor(); // Instance of Predictor Class
@@ -68,32 +71,11 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
     private float AccelerometerZ;
     private long StartTime;
     private long EndTime;
+    private Handler sampleCollectionHandler = new Handler();
+
+    private Context mContext;
 
 
-    // Setters and Getters
-    public float getAccelerometerX() {
-        return AccelerometerX;
-    }
-
-    public void setAccelerometerX(float accelerometerX) {
-        AccelerometerX = accelerometerX;
-    }
-
-    public float getAccelerometerY() {
-        return AccelerometerY;
-    }
-
-    public void setAccelerometerY(float accelerometerY) {
-        AccelerometerY = accelerometerY;
-    }
-
-    public float getAccelerometerZ() {
-        return AccelerometerZ;
-    }
-
-    public void setAccelerometerZ(float accelerometerZ) {
-        AccelerometerZ = accelerometerZ;
-    }
 
 
     @Override
@@ -101,7 +83,6 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
 
         Log.v(TAG, "On Create");
         //For sample
-        mPredictionSample = new PredictionSample();
         mPredictionSamples = new ArrayList<PredictionSample>();
 
         // Activity Detector Setup
@@ -122,33 +103,102 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
         StartTime = System.currentTimeMillis();
         EndTime = System.currentTimeMillis() + 1000 * SensorBlockInSeconds;
 
+
+        //Set up timers
+        //Handler for data collection
+        mPredictionSample = null;
+        sampleCollectionHandler.postDelayed(sampleCollectionRunnable, FrequencyOfSensorDataCollectionInMilliSeconds);
+
+
+        //Timer for activity predictions
+        //Timer for Kinesis Stream Data push
+        //Timer for model update
+
+
+
     }
 
-    private void SetupTimerForAPICall(){
-        /***
-         * Set the timer for 10 Seconds. So after each 10 seconds it take an average of the sensorDataArray and use it to make predictions
-         *
-         */
-        //
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                //At interval get the current
-                float current_X = AccelerometerX;
-                float current_Y = AccelerometerY;
-                float current_Z = AccelerometerZ;
+    private Runnable sampleCollectionRunnable = new Runnable() {
+        @Override
+        public void run() {
+
+            if(mBackgroundServiceRunning){
+
+                long currentTimeStamp = System.currentTimeMillis();
+
+                //Get Sensor Data at 50ms
+                double accel_x = getAccelerometerX();
+                double accel_y = getAccelerometerY();
+                double accel_z = getAccelerometerZ();
+
+                if(mPredictionSample == null){
+                    //If ran for the first time
+                    mPredictionSample = new PredictionSample();
+                    mPredictionSample.setM_SampleStartTime(currentTimeStamp);
+                }
+
+                // Add to the collection
+                if(mPredictionSample.Count() < (int)(SensorBlockInSeconds * 1000/ FrequencyOfSensorDataCollectionInMilliSeconds) ){
+                    //if hundred sensor points are not received in the sample then continue to add it to the sample
+
+                    mPredictionSample.AddAccelerometerX(accel_x);
+                    mPredictionSample.AddAccelerometerY(accel_y);
+                    mPredictionSample.AddAccelerometerZ(accel_z);
+
+                }
+                else{
+                    //if it has reached the 100 limit
+                    //save the existing prediction samples. create a new prediction sample
+                    //Set the endtime
+                    mPredictionSample.setM_SampleEndTime(currentTimeStamp);
+                    //Add sample to the prediction pool
+                    mPredictionSamples.add(mPredictionSample);
+                    //Log.v(TAG, "Start : " + mPredictionSample.getM_SampleStartTime() +  " End: " + mPredictionSample.getM_SampleEndTime()
+                    //         + "  Count : " +  mPredictionSample.Count());
+                    //Reset the sample
+                    mPredictionSample = new PredictionSample();
+                    mPredictionSample.setM_SampleStartTime(currentTimeStamp);
+                }
+
+                //If the prediction pool has reached its limits, send it for predictions on a separate thread
+                if(mPredictionSamples.size() >= mSamplesBatchSize){
+                    //Log.v(TAG, "Sent for batch prediction on separate thread with total samples : " + mPredictionSamples.size());
+                    final ArrayList<PredictionSample> samplesToBeProcessed = SerializationUtils.clone(mPredictionSamples);
+                    mPredictionSamples.clear();
+                    Runnable runnable = new Runnable() {
+                        public void run() {
+                            PredictBatchActivity(samplesToBeProcessed);
+                        }
+                    };
+                    Thread predictionThread = new Thread(runnable);
+                    predictionThread.start();
+                }
+
             }
-        }, TimerIntervalInMilliSeconds, TimerIntervalInMilliSeconds);
 
-    }
+            // Launch the handler again
+            sampleCollectionHandler.postDelayed(this, FrequencyOfSensorDataCollectionInMilliSeconds);
+        }
+    };
+
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         //TODO : Work on the Notification Builder
-
+//        Intent mainIntent = new Intent(this, MainActivity.class);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this, REQUEST_OPEN, mainIntent, 0);
+//
+//        Notification.Builder notificationBuilder = new Notification.Builder(this)
+//                            .setSmallIcon(R.mipmap.ic_launcher)
+//                            .setContentTitle("GoalTick")
+//                            .setContentText("Click to stop tracking your goals.")
+//                            .setContentIntent(pendingIntent);
+//
+//        //notificationBuilder.setAutoCancel(true);
+//        Notification notification = notificationBuilder.build();
+//        startForeground(11, notification);
         // TODO: Check on other options for STICK attribute
         return Service.START_NOT_STICKY;
     }
@@ -179,29 +229,29 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
     }
     //Client (other Activities)
     public void startTracking(){
-
-
         Intent mainIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, REQUEST_OPEN, mainIntent, 0);
 
         Notification.Builder notificationBuilder = new Notification.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle("GoalTick")
+                .setAutoCancel(false)
                 .setContentText("Click to stop tracking your goals.")
                 .setContentIntent(pendingIntent);
 
         //notificationBuilder.setAutoCancel(true);
         Notification notification = notificationBuilder.build();
-        startForeground(11, notification);
-
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(NOTIFY_SERVICE_STATE, notification);
+//        //startForeground(11, notification);
         Log.v(TAG, "Goal Tracking Started.");
         mBackgroundServiceRunning = true;
     }
 
     public void pauseTracking(){
         String ns = Context.NOTIFICATION_SERVICE;
-        NotificationManager nMgr = (NotificationManager) getApplicationContext().getSystemService(ns);
-        nMgr.cancelAll();
+        NotificationManager mNotificationManager = (NotificationManager) getApplicationContext().getSystemService(ns);
+        mNotificationManager.cancel(NOTIFY_SERVICE_STATE);
         Log.v(TAG, "Goal Tracking Paused.");
         mBackgroundServiceRunning = false;
     }
@@ -216,115 +266,107 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
 
         if(mBackgroundServiceRunning && mTrackSensorChange){
 
+            //extract sensor value
             float x = event.values[0];
             float y = event.values[1];
             float z = event.values[2];
 
-            if (!mSensorInitialized) {
-                mLastX = x;
-                mLastY = y;
-                mLastZ = z;
-                mSensorInitialized = true;
-            } else {
-                deltaX = Math.abs(mLastX - x);
-                deltaY = Math.abs(mLastY - y);
-                deltaZ = Math.abs(mLastZ - z);
-                if (deltaX < NOISE) deltaX = (float)0.0;
-                if (deltaY < NOISE) deltaY = (float)0.0;
-                if (deltaZ < NOISE) deltaZ = (float)0.0;
-
-                try {
-                    //Log.v(TAG, "Sensor Changed");
-                    StartTime = System.currentTimeMillis();
-                    if(Math.abs(mLastX - x) > NOISE && Math.abs(mLastY - y) > NOISE && Math.abs(mLastZ -z) > NOISE){
-                        //Log.v(TAG, "Field X: " + deltaX + " Field Y:" + deltaY + "  Field Z:" + deltaZ);
-                        if(EndTime > StartTime){
-                            //set the values
-                            setAccelerometerX(x);
-                            setAccelerometerY(y);
-                            setAccelerometerZ(z);
-                            // Add to the collection
-                            mPredictionSample.AddTimeStamp(StartTime);
-                            mPredictionSample.AddAccelerometerX(x);
-                            mPredictionSample.AddAccelerometerY(y);
-                            mPredictionSample.AddAccelerometerZ(z);
-
-                        }
-                        else{
-
-                            // When sample is gathered. Send it to activity prediction pool
-                            PredictionSample temp = SerializationUtils.clone(mPredictionSample);
-
-                            // It number of samples in the bucket is less than equal to number of samples to predict
-                            if(mPredictionSamples.size() <= mSamplesBatchSize){
-                                mPredictionSamples.add(temp);
-                            }
-                            else{
-                                //Reset the pool
-                                mPredictionSamples.clear();
-                                mPredictionSamples.add(temp);
-                                // Send the Pool for predictions
-                                try {
-                                    PredictBatchActivity(mPredictionSamples);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
-                            // Create a New Sample
-                            mPredictionSample = new PredictionSample();
-                            StartTime = System.currentTimeMillis();;
-                            EndTime = StartTime + 1000 * SensorBlockInSeconds;
-                            mPredictionSample.setM_SampleStartTime(StartTime);
-                            mPredictionSample.setM_SampleEndTime(EndTime);
-                        }
-                    }
+            //set the values
+            setAccelerometerX(x);
+            setAccelerometerY(y);
+            setAccelerometerZ(z);
 
 
-                } catch (Exception e) {
-                    Log.e(TAG, "Error in service OnSensorChanged");
-                    e.printStackTrace();
-                }
-                mLastX = x;
-                mLastY = y;
-                mLastZ = z;
-            }
         }
     }
 
     private void PredictBatchActivity(List<PredictionSample> samples){
-        String currentActivity = "Unknown";
+        Log.v(TAG, " Prediction batch size : " + samples.size());
+
         for (PredictionSample sample : samples){
         // For each sample do the prediction
-          currentActivity =  PredictActivity(sample);
+          String currentActivity =  PredictActivity(sample);
         }
 
-        Log.v(TAG, "Latest Activity " + currentActivity.toString());
-        SendActivityBroadcast(currentActivity.toString());
-
-
     }
 
-    private void SendActivityBroadcast(String activity){
-        //Broadcast
-        Intent localIntent = new Intent(NOTIFY_ACTIVITY_CHANGE);
-        localIntent.putExtra(NOTIFY_CURRENT_ACTIVITY, activity);
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(localIntent);
-    }
+
 
     private String PredictActivity(PredictionSample sample){
 
         if(sample != null && sample.Count() > 0 ){
             ActivityType activity = mPredictor.GetActivity(mActivityDetector, sample.GetSample2());
-
             // Save to Activity Sample Database
             SaveActivitySampleToDb(sample,activity);
+            UpdateGoalCompletion(sample, activity);
             Log.v(TAG, "Start: " + sample.getM_SampleStartTime() + "  End : " + sample.getM_SampleEndTime() + " Count : " +  sample.Count() + " Activity :" + activity.toString());
 
         }
 
         return currentActivity.toString();
     }
+
+    private void UpdateGoalCompletion(PredictionSample sample, ActivityType activity) {
+        //Based on the goals set: update the database
+
+        //Get all the goals
+        GoalDataSource datasource = new GoalDataSource(getApplicationContext());
+        ArrayList<Goal> goals = datasource.readActiveGoals();
+
+        //Iterate with all goals
+        for(Goal goal: goals){
+            Log.v("UPDATE_DB", "current goal " + goal.getGoalTitle());
+            Log.v("UPDATE_DB", CommonUtil.IsActivityTypeSameAsGoalType(goal.getGoalType(), activity.toString()) + " ");
+            Log.v("UPDATE_DB", goal.IsGoalToBeUpdated() + " ");
+            //Check if the goal will be updated or not
+            // if the activity type and goal type is not same then dont need to do anything
+            // if they are the same then check if the goal timing is suited to update or not
+            if(CommonUtil.IsActivityTypeSameAsGoalType(goal.getGoalType(), activity.toString()) && goal.IsGoalToBeUpdated()){
+                int goalID = goal.getGoalID();
+                Log.v("UPDATE_DB", "Is To be Updated or inserted ");
+                String currentDate = CommonUtil.GetCurrentDateString();
+                float completionPercentage = 0.0f;
+                if(goal.getGoalDurationInMinutes() > 0){
+                    completionPercentage = 100.0f * (SensorBlockInSeconds /(float) (goal.getGoalDurationInMinutes() * 60));
+                }
+
+                String goalType = goal.getGoalType();
+                GoalCompletion existingGoalCompletionRow = datasource.readGoalCompletionIDDateWise(goalID, currentDate);
+
+                if(existingGoalCompletionRow != null){
+                    //Update the completion percentage if completion percentage for (GOAL_ID, GOAL_DATE) pair is already available in the databse
+                    //Add the existing the completion percentage with new
+                    float existingCompletionPercentage = existingGoalCompletionRow.getGoalCompletionPercentage();
+                    Log.v("UPDATE_DB", "Existing Completion Percentage : " + existingCompletionPercentage + " for goal ID " + goalID);
+                    completionPercentage = existingCompletionPercentage + completionPercentage;
+                    Log.v("UPDATE_DB", "Updated Completion Percentage : " + completionPercentage + " for goal ID " + goalID);
+                    if(completionPercentage < 100.0f){
+
+                        Log.v("UPDATE_DB", "Updated...");
+
+                        // if completion exceeds 100 then do nothing, else update the value
+                        GoalCompletion goalCompletion = new GoalCompletion(goalID, currentDate, completionPercentage, goalType);
+                        datasource.updateGoalCompletionPercentage(goalCompletion);
+
+                    }
+
+                }
+                else{
+                    //Insert the new completion percentage
+                    Log.v("UPDATE_DB", "inserted ");
+                    GoalCompletion goalCompletion = new GoalCompletion(goalID, currentDate, completionPercentage, goalType);
+                    datasource.insertGoalCompletion(goalCompletion);
+                }
+
+
+            }
+        }
+
+
+
+    }
+
+
 
     private  void SaveActivitySampleToDb(PredictionSample predictionSample, ActivityType activityType){
 
@@ -361,6 +403,30 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
     }
 
 
+    // Setters and Getters
+    public float getAccelerometerX() {
+        return AccelerometerX;
+    }
+
+    public void setAccelerometerX(float accelerometerX) {
+        AccelerometerX = accelerometerX;
+    }
+
+    public float getAccelerometerY() {
+        return AccelerometerY;
+    }
+
+    public void setAccelerometerY(float accelerometerY) {
+        AccelerometerY = accelerometerY;
+    }
+
+    public float getAccelerometerZ() {
+        return AccelerometerZ;
+    }
+
+    public void setAccelerometerZ(float accelerometerZ) {
+        AccelerometerZ = accelerometerZ;
+    }
 
 
 }

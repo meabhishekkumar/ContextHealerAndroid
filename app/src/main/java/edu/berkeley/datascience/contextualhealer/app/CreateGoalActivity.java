@@ -4,14 +4,18 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Pair;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -61,6 +65,7 @@ public class CreateGoalActivity extends AppCompatActivity{
     public static final String EXTRA_GOAL_POSITION = "EXTRA_GOAL_POSITION";
     public static final String EXTRA_GOAL_ID = "EXTRA_GOAL_ID";
     private RelativeLayout mRoolayout;
+    private LinearLayout layout_goal_title,layout_goal_start_time,layout_goal_end_time,layout_goal_duration,layout_goal_repeat;
 
 
     // Chosen values
@@ -106,6 +111,11 @@ public class CreateGoalActivity extends AppCompatActivity{
         tvIsTrackingEnabled = (SwitchCompat) findViewById(R.id.tvIsTrackingEnabled);
         txtDurationInMinutes = (TextView) findViewById(R.id.txtDurationInMinutes);
         mSelectActivityType = (SegmentedGroup) findViewById(R.id.selectActivityType);
+        layout_goal_title = (LinearLayout) findViewById(R.id.layout_goal_title);
+        layout_goal_start_time = (LinearLayout) findViewById(R.id.layout_goal_start_time);
+        layout_goal_end_time = (LinearLayout) findViewById(R.id.layout_goal_end_time);
+        layout_goal_duration = (LinearLayout) findViewById(R.id.layout_goal_duration);
+        layout_goal_repeat = (LinearLayout) findViewById(R.id.layout_goal_repeat);
 
         //Initialize
         calendar = Calendar.getInstance();
@@ -203,6 +213,7 @@ public class CreateGoalActivity extends AppCompatActivity{
 
 
 
+
         btnSaveGoal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -274,7 +285,17 @@ public class CreateGoalActivity extends AppCompatActivity{
         });
 
 
-        txtStartTime.setOnClickListener(new View.OnClickListener() {
+        //Goal Title
+        layout_goal_title.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showSetGoalTitleDialog();
+            }
+        });
+
+
+        //Start Time
+        layout_goal_start_time.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 GetTimeFromPicker(calendar, timePickerDialog, true);
@@ -282,7 +303,8 @@ public class CreateGoalActivity extends AppCompatActivity{
             }
         });
 
-        txtEndTime.setOnClickListener(new View.OnClickListener() {
+        //End Time
+        layout_goal_end_time.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 GetTimeFromPicker(calendar, timePickerDialog, false);
@@ -290,7 +312,16 @@ public class CreateGoalActivity extends AppCompatActivity{
             }
         });
 
-        txtRepeatEvent.setOnClickListener(new View.OnClickListener() {
+        //Goal Duration
+        layout_goal_duration.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showSetGoalDurationDialog();
+            }
+        });
+
+        //Repeat Information
+        layout_goal_repeat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Open the Recurring events thing
@@ -307,6 +338,8 @@ public class CreateGoalActivity extends AppCompatActivity{
                 pickerFrag.show(getSupportFragmentManager(), "SUBLIME_PICKER");
             }
         });
+
+
 
 
 
@@ -350,6 +383,7 @@ public class CreateGoalActivity extends AppCompatActivity{
                     break;
                 case "WEEKLY":
                     repeat = "WEEKLY";
+                    break;
                 case "MONTHLY":
                     repeat = "MONTHLY";
                     break;
@@ -448,4 +482,60 @@ public class CreateGoalActivity extends AppCompatActivity{
     }
 
 
+    //Dialogs
+    protected void showSetGoalTitleDialog() {
+
+        // get prompts.xml view
+        LayoutInflater layoutInflater = LayoutInflater.from(CreateGoalActivity.this);
+        View promptView = layoutInflater.inflate(R.layout.dialog_set_title, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(CreateGoalActivity.this);
+        alertDialogBuilder.setView(promptView);
+
+        final EditText editText = (EditText) promptView.findViewById(R.id.editTextDialogTitle);
+        // setup a dialog window
+        alertDialogBuilder.setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        txtGoalTitle.setText(editText.getText());
+                    }
+                })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        // create an alert dialog
+        AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
+    }
+
+    protected void showSetGoalDurationDialog() {
+
+        // get prompts.xml view
+        LayoutInflater layoutInflater = LayoutInflater.from(CreateGoalActivity.this);
+        View promptView = layoutInflater.inflate(R.layout.dialog_set_duration, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(CreateGoalActivity.this);
+        alertDialogBuilder.setView(promptView);
+
+        final EditText editText = (EditText) promptView.findViewById(R.id.editTextDialogDuration);
+        // setup a dialog window
+        alertDialogBuilder.setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        txtDurationInMinutes.setText(editText.getText());
+                    }
+                })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        // create an alert dialog
+        AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
+    }
 }

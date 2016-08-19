@@ -20,7 +20,6 @@
 			android:layout_width="60dp"
 			android:layout_height="60dp"
 			android:layout_margin="7dp"
-			android:contentDescription="@string/thumbnail"
 			android:src="@drawable/downstairs"/>
 
 		<LinearLayout

@@ -189,32 +189,32 @@ public class GoalSQLiteHelper extends SQLiteOpenHelper {
 
         // For each activity sample in mocked activity sample list
 
-        for(ActivitySample sample : getMockedActivitySamples()){
-
-            ContentValues sampleValues = new ContentValues();
-            sampleValues.put(COLUMN_ACTIVITY_SAMPLES_START_TIME_STAMP, sample.getStartTimeStamp());
-            sampleValues.put(COLUMN_ACTIVITY_SAMPLES_END_TIME_STAMP, sample.getEndTimeStamp());
-            sampleValues.put(COLUMN_ACTIVITY_SAMPLES_DURATION_IN_MILLI_SECS, sample.getDurationInMilliSecs());
-            sampleValues.put(COLUMN_ACTIVITY_SAMPLES_ACTIVITY_TYPE,sample.getActivityType());
-
-            db.insert(ACTIVITY_SAMPLES_TABLE,null,sampleValues);
-
-        }
+//        for(ActivitySample sample : getMockedActivitySamples()){
+//
+//            ContentValues sampleValues = new ContentValues();
+//            sampleValues.put(COLUMN_ACTIVITY_SAMPLES_START_TIME_STAMP, sample.getStartTimeStamp());
+//            sampleValues.put(COLUMN_ACTIVITY_SAMPLES_END_TIME_STAMP, sample.getEndTimeStamp());
+//            sampleValues.put(COLUMN_ACTIVITY_SAMPLES_DURATION_IN_MILLI_SECS, sample.getDurationInMilliSecs());
+//            sampleValues.put(COLUMN_ACTIVITY_SAMPLES_ACTIVITY_TYPE,sample.getActivityType());
+//
+//            db.insert(ACTIVITY_SAMPLES_TABLE,null,sampleValues);
+//
+//        }
 
 
         // Add Mocked GoalCompletions
 
 
 
-        for(GoalCompletion goalCompletion: getMockedGoalCompletions()){
-            ContentValues sampleValues = new ContentValues();
-            sampleValues.put(COLUMN_COMPLETION_TABLE_GOAL_ID, goalCompletion.getGoalID());
-            sampleValues.put(COLUMN_COMPLETION_TABLE_GOAL_DATE, goalCompletion.getGoalDate());
-            sampleValues.put(COLUMN_COMPLETION_TABLE_GOAL_COMPLETION_PERCENTAGE, goalCompletion.getGoalCompletionPercentage());
-            sampleValues.put(COLUMN_COMPLETION_TABLE_GOAL_TYPE,goalCompletion.getGoalType());
-
-            db.insert(GOALS_COMPLETION_TABLE,null,sampleValues);
-        }
+//        for(GoalCompletion goalCompletion: getMockedGoalCompletions()){
+//            ContentValues sampleValues = new ContentValues();
+//            sampleValues.put(COLUMN_COMPLETION_TABLE_GOAL_ID, goalCompletion.getGoalID());
+//            sampleValues.put(COLUMN_COMPLETION_TABLE_GOAL_DATE, goalCompletion.getGoalDate());
+//            sampleValues.put(COLUMN_COMPLETION_TABLE_GOAL_COMPLETION_PERCENTAGE, goalCompletion.getGoalCompletionPercentage());
+//            sampleValues.put(COLUMN_COMPLETION_TABLE_GOAL_TYPE,goalCompletion.getGoalType());
+//
+//            db.insert(GOALS_COMPLETION_TABLE,null,sampleValues);
+//        }
 
 
         db.setTransactionSuccessful();
