@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 
+import android.os.Build;
 import android.os.IBinder;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -32,6 +33,8 @@ import edu.berkeley.datascience.contextualhealer.fragment.fragmentCurrentActivit
 import edu.berkeley.datascience.contextualhealer.R;
 import edu.berkeley.datascience.contextualhealer.service.ContextRecognitionService;
 import edu.berkeley.datascience.contextualhealer.service.ContextRecognitionServiceNew;
+
+import static android.support.v4.app.ActivityCompat.requestPermissions;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -153,9 +156,20 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setCurrentItem(page);
         //tabLayout.setS
 
+        //Setup permission
+        setUpStoragePermission();
 
 
+    }
 
+    private void setUpStoragePermission() {
+        String[] perms = {"android.permission.WRITE_EXTERNAL_STORAGE"};
+
+        int permsRequestCode = 200;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(perms, permsRequestCode);
+        }
     }
 
     @Override

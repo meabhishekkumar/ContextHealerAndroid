@@ -8,9 +8,10 @@ public class ContextualHealerApplicationSettings {
 
     private static final String SETTINGS_ENABLE_TRACKING = "SETTINGS_ENABLE_TRACKING";
     SharedPreferences mSharedPreferences;
-
+    private Context mContext;
 
     public ContextualHealerApplicationSettings(Context context){
+        mContext = context;
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
@@ -24,4 +25,12 @@ public class ContextualHealerApplicationSettings {
                 .putInt(SETTINGS_ENABLE_TRACKING, enableTracking)
                 .apply();
     }
+
+    public String getTrackingModePreference(){
+
+        return mSharedPreferences.getString(mContext.getResources().getString(R.string.key_tracking_mode), "TRACKING_LOCAL"); //Default TRACKING_LOCAL
+    }
+
+
+
 }

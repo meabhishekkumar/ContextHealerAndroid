@@ -13,6 +13,7 @@ import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -22,7 +23,10 @@ import android.util.Log;
 import org.apache.commons.lang3.SerializationUtils;
 import org.json.JSONArray;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,6 +34,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import edu.berkeley.datascience.contextualhealer.ContextualHealerApplicationSettings;
 import edu.berkeley.datascience.contextualhealer.R;
 import edu.berkeley.datascience.contextualhealer.activity.ActivityDetector;
 import edu.berkeley.datascience.contextualhealer.activity.ActivityType;
@@ -49,6 +54,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
+import static android.support.v4.app.ActivityCompat.requestPermissions;
 
 public class ContextRecognitionServiceNew extends Service implements SensorEventListener {
 
@@ -96,6 +103,7 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
         Log.v(TAG, "On Create");
         //For sample
         mPredictionSamples = new ArrayList<PredictionSample>();
+        mContext = getApplicationContext();
 
         // Activity Detector Setup
         boolean ret = mActivityDetector.setup(getApplicationContext());
@@ -294,20 +302,50 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
 
     private void PredictBatchActivity(List<PredictionSample> samples){
         Log.v(TAG, " Prediction batch size : " + samples.size());
-        
 
+        //Get SharedPreference from preferenceManager
+        ContextualHealerApplicationSettings settings = new ContextualHealerApplicationSettings(mContext);
 
-        //Local prediction
-        for (PredictionSample sample : samples){
-        // For each sample do the prediction
-          String currentActivity =  PredictActivity(sample);
+        Log.v(TAG, "Tracking Mode : " + settings.getTrackingModePreference());
+        switch(settings.getTrackingModePreference()){
+            case "TRACKING_LOCAL":
+                Log.v(TAG, "Local Tracking");
+                PredictUsingLocalMode(samples);
+                break;
+            case "TRACKING_SERVER":
+                if(isNetworkAvailable()){
+                    //If server mode is enabled and internet is available then use server mode
+                    PredictUsingServerMode(samples);
+                }
+                else{
+                    PredictUsingLocalMode(samples);
+                }
+                break;
+            default:
+                Log.v(TAG, "Local Tracking");
+                PredictUsingLocalMode(samples);
+                break;
+
         }
+
+
+
 
     }
 
 
 
-  private void PredictUsingAPI(List<PredictionSample> samples){
+    private void PredictUsingLocalMode(List<PredictionSample> samples){
+        //Local prediction
+        for (PredictionSample sample : samples){
+            // For each sample do the prediction
+            String currentActivity =  PredictActivity(sample);
+        }
+    }
+
+
+
+    private void PredictUsingServerMode(final List<PredictionSample> samples){
       Log.v("API_TEST", "Inside prediction API call with total sample : " + samples.size());
 
       JSONArray jsonArray = new JSONArray();
@@ -317,6 +355,8 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
 
 
       Log.v("API_TEST", "Array : " + jsonArray.toString());
+
+      writeToFile(jsonArray.toString(), mContext);
       //Call to API
       MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
@@ -341,18 +381,55 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
           @Override
           public void onFailure(Call call, IOException e) {
               Log.e("API_TEST", "onFailure() Request was:");
-              e.printStackTrace();
+              //If failure on API call, resort to local mode
+              Log.v("API_TEST", e.getStackTrace().toString());
+              PredictUsingLocalMode(samples);
+
           }
 
           @Override
           public void onResponse(Call call, Response response) throws IOException {
+              if(response.isSuccessful()){
+                  Log.e("API_TEST", "onResponse(): " + response.body().string() );
+              }
+              else{
+                  Log.v("API_TEST", "Wrong response code, default to Local Mode");
+                  PredictUsingLocalMode(samples);
+              }
 
-              Log.e("API_TEST", "onResponse(): " + response.body().string() );
+
           }
 
       });
 
   }
+
+    private void writeToFile(String data,Context context) {
+
+
+
+        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File file = new File(path, "sample_data.txt");
+        try {
+            FileOutputStream stream = new FileOutputStream(file, true);
+            stream.write(data.getBytes());
+            stream.close();
+            Log.i("API_TEST", "Data Saved");
+        } catch (IOException e) {
+            Log.e("API_TEST DATA", "Could not write file " + e.getMessage());
+        }
+
+
+//        try {
+//            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("sample_data.txt", Context.MODE_PRIVATE));
+//            outputStreamWriter.write(data);
+//            outputStreamWriter.close();
+//            Log.v("API_TEST", "Sample File Written");
+//        }
+//        catch (IOException e) {
+//            Log.v("API_TEST", "File write failed: " + e.toString());
+//        }
+    }
 
     private boolean isNetworkAvailable() {
 
