@@ -5,7 +5,8 @@
 
     <!-- User permission to run the application on the boot -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- TO make sure the application is used only on smartphones not on tablets -->
     <!--<compatible-screens>-->

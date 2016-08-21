@@ -10,6 +10,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -18,10 +20,13 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import org.apache.commons.lang3.SerializationUtils;
+import org.json.JSONArray;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -37,6 +42,13 @@ import edu.berkeley.datascience.contextualhealer.model.Goal;
 import edu.berkeley.datascience.contextualhealer.model.GoalCompletion;
 import edu.berkeley.datascience.contextualhealer.model.PredictionSample;
 import edu.berkeley.datascience.contextualhealer.utils.CommonUtil;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class ContextRecognitionServiceNew extends Service implements SensorEventListener {
 
@@ -282,7 +294,10 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
 
     private void PredictBatchActivity(List<PredictionSample> samples){
         Log.v(TAG, " Prediction batch size : " + samples.size());
+        
 
+
+        //Local prediction
         for (PredictionSample sample : samples){
         // For each sample do the prediction
           String currentActivity =  PredictActivity(sample);
@@ -290,6 +305,68 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
 
     }
 
+
+
+  private void PredictUsingAPI(List<PredictionSample> samples){
+      Log.v("API_TEST", "Inside prediction API call with total sample : " + samples.size());
+
+      JSONArray jsonArray = new JSONArray();
+      for (int i=0; i < samples.size(); i++) {
+          jsonArray.put(samples.get(i).getJSONObjectForAPICall());
+      }
+
+
+      Log.v("API_TEST", "Array : " + jsonArray.toString());
+      //Call to API
+      MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+      RequestBody body = RequestBody.create(JSON, jsonArray.toString());
+
+
+
+      OkHttpClient client = new OkHttpClient();
+      String response = "";
+
+      //Use 10.0.2.2 for localhost or 127.0.0.1 : for genymotion it 10.0.3.2
+      String url = "http://ec2-54-174-44-241.compute-1.amazonaws.com:5000/predict";
+
+      Request request = new Request.Builder()
+              .url(url)
+              .post(body)
+              .build();
+
+      Call call = client.newCall(request);
+
+      call.enqueue(new Callback() {
+          @Override
+          public void onFailure(Call call, IOException e) {
+              Log.e("API_TEST", "onFailure() Request was:");
+              e.printStackTrace();
+          }
+
+          @Override
+          public void onResponse(Call call, Response response) throws IOException {
+
+              Log.e("API_TEST", "onResponse(): " + response.body().string() );
+          }
+
+      });
+
+  }
+
+    private boolean isNetworkAvailable() {
+
+        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+
+        boolean isAvailable = false;
+        if (networkInfo != null && networkInfo.isConnected())
+        {
+            isAvailable = true;
+
+        }
+        return isAvailable;
+    }
 
 
     private String PredictActivity(PredictionSample sample){

@@ -10,8 +10,11 @@ import org.apache.commons.math3.stat.descriptive.SynchronizedDescriptiveStatisti
 import org.apache.commons.math3.stat.descriptive.moment.Kurtosis;
 import org.apache.commons.math3.util.DoubleArray;
 import org.apache.commons.math3.util.FastMath;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PredictionSample implements java.io.Serializable {
@@ -67,6 +70,20 @@ public class PredictionSample implements java.io.Serializable {
         m_TimeStamp.add((long) timestamp);
     }
 
+    public String getJSONObjectForAPICall(){
+        JSONObject obj = new JSONObject();
+        try {
+
+            obj.put("xAcc", Arrays.deepToString(m_AccelerometerX.toArray()));
+            obj.put("yAcc", Arrays.deepToString(m_AccelerometerY.toArray()));
+            obj.put("zAcc", Arrays.deepToString(m_AccelerometerZ.toArray()));
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return  obj.toString();
+    }
 
     private DescriptiveStatistics GetStats(ArrayList<Double> accelerometer_data){
         double[] data = ArrayUtils.toPrimitive(accelerometer_data.toArray(new Double[accelerometer_data.size()]));
