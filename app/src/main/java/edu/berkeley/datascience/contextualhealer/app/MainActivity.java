@@ -33,6 +33,7 @@ import edu.berkeley.datascience.contextualhealer.fragment.fragmentCurrentActivit
 import edu.berkeley.datascience.contextualhealer.R;
 import edu.berkeley.datascience.contextualhealer.service.ContextRecognitionService;
 import edu.berkeley.datascience.contextualhealer.service.ContextRecognitionServiceNew;
+import edu.berkeley.datascience.contextualhealer.utils.Benchmarking;
 
 import static android.support.v4.app.ActivityCompat.requestPermissions;
 
@@ -158,6 +159,11 @@ public class MainActivity extends AppCompatActivity {
 
         //Setup permission
         //setUpStoragePermission();
+
+        //BenchMarking
+        //Benchmarking benchmarking = new Benchmarking(MainActivity.this);
+        //benchmarking.RunBenchMarking();
+
 
 
     }

@@ -226,8 +226,8 @@ public class PredictionSample implements java.io.Serializable {
         int[] range = new int[]{ 10, 20, 30, 40, 50, 60, 70, 80, 90};
         for( int i = 0; i < range.length; i++) {
             double Percentile_x = stats_accel_x.getPercentile(range[i]);
-            double Percentile_y = stats_accel_x.getPercentile(range[i]);
-            double Percentile_z = stats_accel_x.getPercentile(range[i]);
+            double Percentile_y = stats_accel_y.getPercentile(range[i]);
+            double Percentile_z = stats_accel_z.getPercentile(range[i]);
             sample.add(Percentile_x);
             sample.add(Percentile_y);
             sample.add(Percentile_z);

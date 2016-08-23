@@ -140,8 +140,8 @@ static double makePredictions(const double* inputs) {
 
 
 static int makePredictionForAcivityClass(int featurescount, const double* inputs) {
-    LOG(INFO) << "x86 Architecture";
-    LOG(INFO) << "features count : "<< featurescount;
+    //LOG(INFO) << "x86 Architecture";
+    //LOG(INFO) << "features count : "<< featurescount;
 	// Create input tensor
 	Tensor input_tensor( tensorflow::DT_FLOAT,
 						 tensorflow::TensorShape( {1,featurescount} ) );
@@ -152,7 +152,7 @@ static int makePredictionForAcivityClass(int featurescount, const double* inputs
        	}
 
 
-	LOG(INFO) << "Start computing.";
+	//LOG(INFO) << "Start computing.";
 
 	std::vector<std::pair<std::string, tensorflow::Tensor> > input_tensors(
 		{{"input", input_tensor}});
@@ -165,7 +165,7 @@ static int makePredictionForAcivityClass(int featurescount, const double* inputs
 									  {},
 									  &output_tensors );
 
-	LOG(INFO) << "End computing.";
+	//LOG(INFO) << "End computing.";
 
 	if (!run_status.ok()) {
 		LOG(ERROR) << "Error during inference: " << run_status;
@@ -186,9 +186,10 @@ static int makePredictionForAcivityClass(int featurescount, const double* inputs
     			max_score = score;
     		}
 
-    		VLOG(0) <<  " (" << i << "): " << score;
+    	//	VLOG(0) <<  " (" << i << "): " << score;
     	}
 
+    //LOG(INFO) << "MaxIndex" << maxIndex;
     return maxIndex;
 
 	//return  output_flat(0);;
