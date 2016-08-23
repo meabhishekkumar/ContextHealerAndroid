@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.berkeley.datascience.contextualhealer.utils.CommonUtil;
+
 public class PredictionSample implements java.io.Serializable {
 
     public PredictionSample(){
@@ -26,7 +28,21 @@ public class PredictionSample implements java.io.Serializable {
         m_TimeStamp = new ArrayList<Long>();
     }
 
+
     private ArrayList<Double> m_AccelerometerX;
+
+    public ArrayList<Double> getM_AccelerometerX() {
+        return m_AccelerometerX;
+    }
+
+    public ArrayList<Double> getM_AccelerometerY() {
+        return m_AccelerometerY;
+    }
+
+    public ArrayList<Double> getM_AccelerometerZ() {
+        return m_AccelerometerZ;
+    }
+
     private ArrayList<Double> m_AccelerometerY;
     private ArrayList<Double> m_AccelerometerZ;
     private ArrayList<Long> m_TimeStamp;
@@ -70,19 +86,17 @@ public class PredictionSample implements java.io.Serializable {
         m_TimeStamp.add((long) timestamp);
     }
 
-    public String getJSONObjectForAPICall(){
+    public JSONObject getJSONObjectForAPICall(){
         JSONObject obj = new JSONObject();
         try {
-
-            obj.put("xAcc", Arrays.deepToString(m_AccelerometerX.toArray()));
-            obj.put("yAcc", Arrays.deepToString(m_AccelerometerY.toArray()));
-            obj.put("zAcc", Arrays.deepToString(m_AccelerometerZ.toArray()));
-
+            obj.put("xAcc", CommonUtil.getDoubleArray(m_AccelerometerX));
+            obj.put("yAcc", CommonUtil.getDoubleArray(m_AccelerometerY));
+            obj.put("zAcc", CommonUtil.getDoubleArray(m_AccelerometerZ));
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return  obj.toString();
+        return  obj;
     }
 
     private DescriptiveStatistics GetStats(ArrayList<Double> accelerometer_data){

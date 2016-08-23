@@ -22,6 +22,7 @@ import android.util.Log;
 
 import org.apache.commons.lang3.SerializationUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -350,25 +351,25 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
 
       JSONArray jsonArray = new JSONArray();
       for (int i=0; i < samples.size(); i++) {
-          jsonArray.put(samples.get(i).getJSONObjectForAPICall());
+          jsonArray.put(CommonUtil.getJSONObjectForAPICall(samples.get(i)));
       }
 
+      //Log.v("API_TEST", "JSON : " + jsonArray);
+      //Log.v("API_TEST", "Array : " + jsonArray.toString());
 
-      Log.v("API_TEST", "Array : " + jsonArray.toString());
-
-      writeToFile(jsonArray.toString(), mContext);
+      //writeToFile(jsonArray.toString(), mContext);
       //Call to API
       MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
       RequestBody body = RequestBody.create(JSON, jsonArray.toString());
 
-
+        //writeToFile(jsonArray.toString(), mContext);
 
       OkHttpClient client = new OkHttpClient();
       String response = "";
 
       //Use 10.0.2.2 for localhost or 127.0.0.1 : for genymotion it 10.0.3.2
-      String url = "http://ec2-54-174-44-241.compute-1.amazonaws.com:5000/predict";
+      String url = "http://ec2-54-174-44-241.compute-1.amazonaws.com:5000/predict?inbound_data_type=STRING";
 
       Request request = new Request.Builder()
               .url(url)
@@ -390,7 +391,10 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
           @Override
           public void onResponse(Call call, Response response) throws IOException {
               if(response.isSuccessful()){
-                  Log.e("API_TEST", "onResponse(): " + response.body().string() );
+                  String result = response.body().string();
+                  //Log.e("API_TEST", "onResponse(): " + result );
+                  //If response is successful the send it to the databse
+                  ProcessPredictionAPIResponse(samples, result);
               }
               else{
                   Log.v("API_TEST", "Wrong response code, default to Local Mode");
@@ -403,6 +407,25 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
       });
 
   }
+
+    private void ProcessPredictionAPIResponse(final List<PredictionSample> samples, String response) {
+        String[] activities = response.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\\s", "").split(",");
+
+        for(int i = 0; i < samples.size(); i++){
+
+            PredictionSample sample = samples.get(i);
+            ActivityType activity = CommonUtil.getActivityTypeFromString(activities[i]);
+
+            //Log.v("API_TEST", " Activity String " + activities[i] + " Type: " + activity);
+            // Save to Activity Sample Database
+            SaveActivitySampleToDb(sample,activity);
+            UpdateGoalCompletion(sample, activity);
+            Log.v("API_TEST", "Mode: Server : Start: " + sample.getM_SampleStartTime() + "  End : " + sample.getM_SampleEndTime() + " Count : " +  sample.Count() + " Activity :" + activity.toString());
+
+        }
+
+
+    }
 
     private void writeToFile(String data,Context context) {
 
@@ -459,6 +482,8 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
 
         return currentActivity.toString();
     }
+
+
 
     private void UpdateGoalCompletion(PredictionSample sample, ActivityType activity) {
         //Based on the goals set: update the database

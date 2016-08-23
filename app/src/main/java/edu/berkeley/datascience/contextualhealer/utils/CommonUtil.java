@@ -2,20 +2,29 @@ package edu.berkeley.datascience.contextualhealer.utils;
 
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.TimeZone;
 
+import edu.berkeley.datascience.contextualhealer.activity.ActivityType;
 import edu.berkeley.datascience.contextualhealer.model.ActivitySample;
+import edu.berkeley.datascience.contextualhealer.model.PredictionSample;
 
 public class CommonUtil {
+
+    private static final String TAG = CommonUtil.class.getSimpleName();
 
     public static Date ParseTimeString(String timeString){
         //parse the timestring in HH:mm format to date
@@ -212,6 +221,55 @@ public class CommonUtil {
         formatter.setCalendar(cal);
         formatter.setTimeZone(tz);
         return formatter.format(cal.getTime());
+    }
+
+    public static String getDoubleArray(ArrayList<Double> items){
+        float[] result  = new float[items.size()];
+        int count = 0;
+        for(Double item: items){
+            result[count] = item.floatValue();
+            count = count + 1;
+            //Log.v("API_TEST", "Value : " + item.floatValue());
+        }
+        //Log.v("API_TEST", "result : " + Arrays.toString(result));
+        return  Arrays.toString(result);
+    }
+
+    public static JSONObject getJSONObjectForAPICall(PredictionSample sample){
+        JSONObject obj = new JSONObject();
+        try {
+
+            //Log.v("API_TEST","xACC" +  CommonUtil.getDoubleArray(sample.getM_AccelerometerX()));
+            obj.put("xAcc", CommonUtil.getDoubleArray(sample.getM_AccelerometerX()));
+            obj.put("yAcc", CommonUtil.getDoubleArray(sample.getM_AccelerometerY()));
+            obj.put("zAcc", CommonUtil.getDoubleArray(sample.getM_AccelerometerZ()));
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return  obj;
+    }
+
+    public static ActivityType getActivityTypeFromString(String activityStr){
+        activityStr = activityStr.replaceAll("^\"|\"$", "").toLowerCase();
+        ActivityType activity  = null;
+        switch (activityStr.toLowerCase()) {
+            case "downstairs":  activity = ActivityType.downstairs;
+                break;
+            case "jogging":  activity = ActivityType.jogging;
+                break;
+            case "sitting":  activity = ActivityType.sitting;
+                break;
+            case "standing":  activity = ActivityType.standing;
+                break;
+            case "upstairs":  activity = ActivityType.upstairs;
+                break;
+            case "walking":  activity = ActivityType.walking;
+                break;
+            default: activity = ActivityType.unknown;
+                break;
+        }
+        return  activity;
     }
 
 

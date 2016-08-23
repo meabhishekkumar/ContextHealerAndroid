@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
         //tabLayout.setS
 
         //Setup permission
-        setUpStoragePermission();
+        //setUpStoragePermission();
 
 
     }

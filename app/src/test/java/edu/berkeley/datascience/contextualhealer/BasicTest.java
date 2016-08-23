@@ -55,4 +55,8 @@ public class BasicTest {
 
     }
 
+    @Test
+    public void ParseResponseString(){
+      //String response =  ["Sitting", "Sitting", "Sitting", "Sitting", "Sitting", "Sitting", "Sitting", "Sitting", "Sitting", "Sitting", "Sitting", "Sitting"];
+    }
 }
