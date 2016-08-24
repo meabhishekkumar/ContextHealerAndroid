@@ -273,5 +273,11 @@ public class CommonUtil {
     }
 
 
-
+    public static double[] getScaledData(double[] data, double[] means, double[] stds) {
+        double[] result = new double[data.length];
+        for (int i = 0; i < data.length; i++) {
+            result[i] = (data[i] - means[i])/ stds[i];
+        }
+        return result;
+    }
 }

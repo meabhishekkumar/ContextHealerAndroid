@@ -162,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
 
         //BenchMarking
         //Benchmarking benchmarking = new Benchmarking(MainActivity.this);
+        //benchmarking.CheckFeaturEngineering();
         //benchmarking.RunBenchMarking();
 
 
