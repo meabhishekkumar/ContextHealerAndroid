@@ -455,6 +455,7 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
             PredictionSample sample = samples.get(i);
             ActivityType activity = CommonUtil.getActivityTypeFromString(activities[i]);
             sample.setActivityType(activity);
+            streamSamples.add(sample);
             //Log.v("API_TEST", " Activity String " + activities[i] + " Type: " + activity);
             // Save to Activity Sample Database
             SaveActivitySampleToDb(sample,activity);

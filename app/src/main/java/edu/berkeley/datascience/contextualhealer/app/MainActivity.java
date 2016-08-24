@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
         mchkContextService = (SwitchCompat) findViewById(R.id.chkContextService);
 
+
         //get the settings from sharedPreference
         ContextualHealerApplicationSettings settings = new ContextualHealerApplicationSettings(MainActivity.this);
         if(settings.getEnableTrackingPreference() == 1){

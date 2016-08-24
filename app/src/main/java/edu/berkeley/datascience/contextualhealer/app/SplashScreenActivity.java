@@ -7,14 +7,17 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import edu.berkeley.datascience.contextualhealer.ContextualHealerApplicationSettings;
 import edu.berkeley.datascience.contextualhealer.R;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
+    private static final String TAG = SplashScreenActivity.class.getSimpleName();
     private Button btnGetStarted;
     private TextView txtGoalTitle;
 
@@ -22,6 +25,23 @@ public class SplashScreenActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
+
+        ContextualHealerApplicationSettings settings = new ContextualHealerApplicationSettings(SplashScreenActivity.this);
+        Log.v(TAG, "First Run :" + settings.getFirstRun());
+
+        if(settings.getFirstRun()){
+          //if not the first run
+            settings.setFirstRun();
+            Log.v(TAG, "After setting up" + settings.getFirstRun());
+
+        }
+        else{
+            Intent intent = new Intent(SplashScreenActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+
 
         txtGoalTitle = (TextView) findViewById(R.id.txtSplashTitle);
         btnGetStarted = (Button) findViewById(R.id.btnGetStarted);
