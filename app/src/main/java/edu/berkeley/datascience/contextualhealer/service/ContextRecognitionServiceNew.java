@@ -6,6 +6,9 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -252,8 +255,9 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
 //        //notificationBuilder.setAutoCancel(true);
 //        Notification notification = notificationBuilder.build();
 //        startForeground(11, notification);
-        // TODO: Check on other options for STICK attribute
-        return Service.START_NOT_STICKY;
+
+        //Returning the Sticky so, that the service can be resumed even it is closed somehow
+        return Service.START_STICKY;
     }
 
     @Nullable
@@ -280,23 +284,35 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
             return ContextRecognitionServiceNew.this;
         }
     }
+
+    public static boolean isAvailable(Context ctx, Intent intent) {
+        final PackageManager mgr = ctx.getPackageManager();
+        List<ResolveInfo> list =
+                mgr.queryIntentActivities(intent,
+                        PackageManager.MATCH_DEFAULT_ONLY);
+        return list.size() > 0;
+    }
+
+
     //Client (other Activities)
     public void startTracking(){
         Intent mainIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, REQUEST_OPEN, mainIntent, 0);
 
         Notification.Builder notificationBuilder = new Notification.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("GoalTick")
+                .setSmallIcon(R.drawable.notification_icon_small)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.target_grey))
                 .setAutoCancel(false)
+                .setContentTitle("GoalTick")
                 .setContentText("Click to stop tracking your goals.")
+                .setSubText("Tap to view goalTick app")
                 .setContentIntent(pendingIntent);
 
         //notificationBuilder.setAutoCancel(true);
         Notification notification = notificationBuilder.build();
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(NOTIFY_SERVICE_STATE, notification);
-//        //startForeground(11, notification);
+        startForeground(11, notification);
         Log.v(TAG, "Goal Tracking Started.");
         mBackgroundServiceRunning = true;
     }
@@ -305,6 +321,7 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
         String ns = Context.NOTIFICATION_SERVICE;
         NotificationManager mNotificationManager = (NotificationManager) getApplicationContext().getSystemService(ns);
         mNotificationManager.cancel(NOTIFY_SERVICE_STATE);
+        stopForeground(true);
         Log.v(TAG, "Goal Tracking Paused.");
         mBackgroundServiceRunning = false;
     }
