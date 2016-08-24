@@ -29,3 +29,4 @@
 -dontwarn org.apache.commons.math3.geometry.euclidean.twod.Line
 -dontwarn okio.**
 -dontwarn com.opencsv.**
+-dontwarn com.amazonaws.util.json.JacksonFactory**

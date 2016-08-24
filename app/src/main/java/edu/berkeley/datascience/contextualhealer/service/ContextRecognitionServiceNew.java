@@ -16,9 +16,16 @@ import android.os.Binder;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseClient;
+import com.amazonaws.services.kinesisfirehose.model.PutRecordBatchRequest;
+import com.amazonaws.services.kinesisfirehose.model.Record;
 
 import org.apache.commons.lang3.SerializationUtils;
 import org.json.JSONArray;
@@ -28,6 +35,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,6 +48,7 @@ import edu.berkeley.datascience.contextualhealer.R;
 import edu.berkeley.datascience.contextualhealer.activity.ActivityDetector;
 import edu.berkeley.datascience.contextualhealer.activity.ActivityType;
 import edu.berkeley.datascience.contextualhealer.activity.OnDevicePredictor;
+import edu.berkeley.datascience.contextualhealer.activity.PredictionMode;
 import edu.berkeley.datascience.contextualhealer.app.MainActivity;
 import edu.berkeley.datascience.contextualhealer.database.GoalDataSource;
 import edu.berkeley.datascience.contextualhealer.interfaces.IPredictor;
@@ -93,7 +102,16 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
     private long EndTime;
     private Handler sampleCollectionHandler = new Handler();
 
+
+    //For Kinesis Stream
+    private CognitoCachingCredentialsProvider credentialsProvider;
+    private AmazonKinesisFirehoseClient firehoseClient;
+    private final String deliveryStreamName = "abhi-kinesis-stream-1";
+    private String deviceID;
+
     private Context mContext;
+
+
 
 
 
@@ -105,6 +123,20 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
         //For sample
         mPredictionSamples = new ArrayList<PredictionSample>();
         mContext = getApplicationContext();
+
+        //Kinesis Stream
+        // Initialize the Amazon Cognito credentials provider
+        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
+                getApplicationContext(),
+                "us-east-1:1cf60624-e37d-4a26-944c-b40782a7d558", // Identity Pool ID
+                Regions.US_EAST_1 // Region
+        );
+        //Unique Device ID
+        deviceID = Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        // AWS Firehose Setup
+        firehoseClient = new AmazonKinesisFirehoseClient(credentialsProvider);
+
 
         // Activity Detector Setup
         boolean ret = mActivityDetector.setup(getApplicationContext());
@@ -329,24 +361,29 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
 
         }
 
-
-
-
     }
 
 
 
     private void PredictUsingLocalMode(List<PredictionSample> samples){
+        ArrayList<PredictionSample> streamSamples = new ArrayList<>();
+
         //Local prediction
         for (PredictionSample sample : samples){
             // For each sample do the prediction
-            String currentActivity =  PredictActivity(sample);
+            ActivityType currentActivity =  PredictActivity(sample);
+            sample.setActivityType(currentActivity);
+            streamSamples.add(sample);
         }
+
+        SendToKinesisStream(streamSamples, PredictionMode.Local);
     }
 
 
 
     private void PredictUsingServerMode(final List<PredictionSample> samples){
+
+
       Log.v("API_TEST", "Inside prediction API call with total sample : " + samples.size());
 
       JSONArray jsonArray = new JSONArray();
@@ -409,13 +446,15 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
   }
 
     private void ProcessPredictionAPIResponse(final List<PredictionSample> samples, String response) {
+        ArrayList<PredictionSample> streamSamples = new ArrayList<>();
+
         String[] activities = response.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\\s", "").split(",");
 
         for(int i = 0; i < samples.size(); i++){
 
             PredictionSample sample = samples.get(i);
             ActivityType activity = CommonUtil.getActivityTypeFromString(activities[i]);
-
+            sample.setActivityType(activity);
             //Log.v("API_TEST", " Activity String " + activities[i] + " Type: " + activity);
             // Save to Activity Sample Database
             SaveActivitySampleToDb(sample,activity);
@@ -424,11 +463,12 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
 
         }
 
+        SendToKinesisStream(streamSamples, PredictionMode.Server);
+
 
     }
 
     private void writeToFile(String data,Context context) {
-
 
 
         File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
@@ -442,16 +482,6 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
             Log.e("API_TEST DATA", "Could not write file " + e.getMessage());
         }
 
-
-//        try {
-//            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("sample_data.txt", Context.MODE_PRIVATE));
-//            outputStreamWriter.write(data);
-//            outputStreamWriter.close();
-//            Log.v("API_TEST", "Sample File Written");
-//        }
-//        catch (IOException e) {
-//            Log.v("API_TEST", "File write failed: " + e.toString());
-//        }
     }
 
     private boolean isNetworkAvailable() {
@@ -469,10 +499,12 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
     }
 
 
-    private String PredictActivity(PredictionSample sample){
+    private ActivityType PredictActivity(PredictionSample sample){
 
         if(sample != null && sample.Count() > 0 ){
             ActivityType activity = mPredictor.GetActivity(mActivityDetector, sample.GetSample2());
+            sample.setActivityType(activity);
+
             // Save to Activity Sample Database
             SaveActivitySampleToDb(sample,activity);
             UpdateGoalCompletion(sample, activity);
@@ -480,8 +512,58 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
 
         }
 
-        return currentActivity.toString();
+        return sample.getActivityType();
     }
+
+
+    private void SendToKinesisStream(ArrayList<PredictionSample> samples, PredictionMode mode){
+
+        //Get SharedPreference from preferenceManager
+        ContextualHealerApplicationSettings settings = new ContextualHealerApplicationSettings(mContext);
+        boolean isKinesisStreamEnabled = settings.getEnableKinesisStreamPreference();
+        Log.v(TAG, "Enable Kinesis Stream : " + isKinesisStreamEnabled);
+
+        if(isKinesisStreamEnabled && isNetworkAvailable()){
+            try{
+                PutRecordBatchRequest putRecordBatchRequest = new PutRecordBatchRequest();
+                putRecordBatchRequest.setDeliveryStreamName(deliveryStreamName);
+                List<Record> recordList = new ArrayList<Record>();
+
+                for(PredictionSample sample: samples){
+                    ArrayList<Double> arr_accel_x = sample.getM_AccelerometerX();
+                    ArrayList<Double> arr_accel_y = sample.getM_AccelerometerY();
+                    ArrayList<Double> arr_accel_z = sample.getM_AccelerometerZ();
+                    int recordCount = 0;
+                    for (int i = 0; i < sample.Count(); i++) {
+                        recordCount = recordCount + 1;
+                        String data = deviceID + "," + sample.getM_SampleStartTime() + "," + sample.getM_SampleEndTime() + ","
+                                + arr_accel_x.get(i) + "," + arr_accel_y.get(i) + "," + arr_accel_z.get(i) + "," + sample.getActivityType().toString() + "," + mode.toString() + "\r\n";
+                        Record record = new Record();
+                        ByteBuffer buff = ByteBuffer.wrap(data.getBytes());
+                        record.setData(buff);
+                        recordList.add(record);
+                        //Log.e("KINESIS_STREAM", "KinesisStream:" + data);
+                    }
+                    // Put Record Batch records. Max No.Of Records we can put in a
+                    // single put record batch request is 500
+                    putRecordBatchRequest.setRecords(recordList);
+                    firehoseClient.putRecordBatch(putRecordBatchRequest);
+                    recordList.clear();
+                }
+
+
+            }catch (Exception e){
+                Log.v(TAG, " Error in Kinesis stream. Exception log: " + e.getStackTrace().toString());
+
+            }
+
+
+
+        }
+
+
+    }
+
 
 
 

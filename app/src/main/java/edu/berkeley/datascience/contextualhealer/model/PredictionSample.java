@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.berkeley.datascience.contextualhealer.activity.ActivityType;
 import edu.berkeley.datascience.contextualhealer.utils.CommonUtil;
 
 public class PredictionSample implements java.io.Serializable {
@@ -28,6 +29,13 @@ public class PredictionSample implements java.io.Serializable {
         m_TimeStamp = new ArrayList<Long>();
     }
 
+
+
+    private ActivityType mActivityType;
+
+    public ActivityType getActivityType() { return mActivityType; }
+
+    public void setActivityType(ActivityType activityType) { mActivityType = activityType; }
 
     private ArrayList<Double> m_AccelerometerX;
 

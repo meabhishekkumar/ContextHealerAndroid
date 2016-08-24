@@ -32,5 +32,9 @@ public class ContextualHealerApplicationSettings {
     }
 
 
+    public Boolean getEnableKinesisStreamPreference(){
+
+        return mSharedPreferences.getBoolean(mContext.getResources().getString(R.string.enable_data_stream),false); //Default false
+    }
 
 }
