@@ -27,15 +27,50 @@ public class CommonUtil {
     private static final String TAG = CommonUtil.class.getSimpleName();
 
     public static Date ParseTimeString(String timeString){
+        String[] split = timeString.trim().split(":");
+        int hours = Integer.valueOf(split[0].trim());
+        int minutes = Integer.valueOf(split[1].trim());
+
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY,hours);
+        cal.set(Calendar.MINUTE,minutes);
+        cal.set(Calendar.SECOND,0);
+        cal.set(Calendar.MILLISECOND,0);
+
+        Date d = cal.getTime();
+        return  d;
+
+
         //parse the timestring in HH:mm format to date
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-        Date date = null;
-        try {
-            date = sdf.parse(timeString);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return  date;
+//        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+
+//        Date result = null;
+//        try {
+//            //Parsed time with date of 1970
+//            Date parsed_time = sdf.parse(timeString);
+//            Calendar parsed_calender = Calendar.getInstance();
+//            parsed_calender.setTime(parsed_time);
+//
+//            //Current date
+//            Date current_date_time =  new Date(System.currentTimeMillis());
+//            Calendar current_calender = Calendar.getInstance();
+//            current_calender.setTime(current_date_time);
+//
+//            //Mix Both
+//            Calendar result_calender = Calendar.getInstance();
+//
+//            result_calender.set(current_calender.get(Calendar.YEAR), current_calender.get(Calendar.MONTH),
+//                    current_calender.get(Calendar.DAY_OF_MONTH), parsed_calender.get(Calendar.HOUR),
+//                    parsed_calender.get(Calendar.MINUTE), 0);
+//
+//            result = new Date(result_calender.getTimeInMillis());
+//
+//
+//
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//        return  result;
     }
 
     public static Boolean IsSameDay(Date date1, Date date2){
@@ -156,7 +191,7 @@ public class CommonUtil {
     public static boolean IsActivityTypeSameAsGoalType(String goalType, String activityType){
         //Currently the activity supported are jogging, walking and staircase
 
-        Log.v("UPDATE_DB", "Goal Type : " + goalType + " Activity type " + activityType);
+      //  Log.v("UPDATE_DB", "Goal Type : " + goalType + " Activity type " + activityType);
       boolean result = false;
         if(goalType.equals("jogging") && activityType.equals("jogging")){
             result = true;

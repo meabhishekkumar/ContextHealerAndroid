@@ -234,7 +234,7 @@ public class GoalSQLiteHelper extends SQLiteOpenHelper {
         goal_1.setCompletedPercentage(70);
         Goal goal_2 = new Goal(2, "Walking to Office",ActivityType.walking.toString(),10, "DAILY","","09:00", "10:00",day1_str, 1,0);
         goal_2.setCompletedPercentage(50);
-        Goal goal_3 = new Goal(3, "Use Stairs",ActivityType.staircase.toString(),10, "NEVER", "","10:00", "22:00",day1_str, 1,0);
+        Goal goal_3 = new Goal(3, "Use Stairs",ActivityType.staircase.toString(),10, "DAILY", "","10:00", "22:00",day1_str, 1,0);
         goal_3.setCompletedPercentage(20);
         dataList.add(goal_1);
         dataList.add(goal_2);

@@ -594,15 +594,16 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
 
         //Iterate with all goals
         for(Goal goal: goals){
-            Log.v("UPDATE_DB", "current goal " + goal.getGoalTitle());
-            Log.v("UPDATE_DB", CommonUtil.IsActivityTypeSameAsGoalType(goal.getGoalType(), activity.toString()) + " ");
-            Log.v("UPDATE_DB", goal.IsGoalToBeUpdated() + " ");
+
             //Check if the goal will be updated or not
             // if the activity type and goal type is not same then dont need to do anything
             // if they are the same then check if the goal timing is suited to update or not
-            if(CommonUtil.IsActivityTypeSameAsGoalType(goal.getGoalType(), activity.toString()) && goal.IsGoalToBeUpdated()){
+            if((goal.getIsGoalCurrentlyTracked() == 1) &&  CommonUtil.IsActivityTypeSameAsGoalType(goal.getGoalType(), activity.toString()) && goal.IsGoalToBeUpdated()){
                 int goalID = goal.getGoalID();
-                Log.v("UPDATE_DB", "Is To be Updated or inserted ");
+                Log.v("UPDATE_DB", "current goal " + goal.getGoalTitle());
+                Log.v("UPDATE_DB","IsActivitySame: " +  CommonUtil.IsActivityTypeSameAsGoalType(goal.getGoalType(), activity.toString()) + " ");
+                Log.v("UPDATE_DB", "IsGoalToBeUpdated" + goal.IsGoalToBeUpdated() + " " );
+
                 String currentDate = CommonUtil.GetCurrentDateString();
                 float completionPercentage = 0.0f;
                 if(goal.getGoalDurationInMinutes() > 0){

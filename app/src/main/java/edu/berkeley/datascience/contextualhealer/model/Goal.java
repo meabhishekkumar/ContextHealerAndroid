@@ -307,7 +307,7 @@ public class Goal  implements Parcelable {
         Date endTimeStamp = CommonUtil.ParseTimeString(mGoalEndTime);
 
         //if the goal is set to be tracked. Then look at the repeat type
-        if(mGoalRepeatType == "NONE" ){
+        if(mGoalRepeatType.equals("NEVER") ){
             // if the date of goal creation is same as today : i.e. goal has been created today only : track it else leave it
             if(CommonUtil.IsSameDay(goalSetDate, CommonUtil.GetCurrentDate())){
                 // if it is the same day then check if the current time is between goal start time and end time
@@ -321,13 +321,13 @@ public class Goal  implements Parcelable {
             }
         }
 
-        if(mGoalRepeatType == "DAILY"){
+        if(mGoalRepeatType.equals("DAILY")){
             // if the repeat type is DAILY then simply check if the current time is between goal start and end time
             result = CommonUtil.IsCurrentDateBetweenStartAndEnd(startTimeStamp, endTimeStamp);
             return result;
         }
 
-        if(mGoalRepeatType == "WEEKLY"){
+        if(mGoalRepeatType.equals("WEEKLY")){
             // if the repeat type is Weekly, then check if the current day is same as the day of goal creation
             if(CommonUtil.GetCurrentDayOfWeek() == CommonUtil.GetDayOfWeek(goalSetDate)){
                 //If yes, then simply check if the current time is between goal start and end time
@@ -340,7 +340,7 @@ public class Goal  implements Parcelable {
             }
         }
 
-        if(mGoalRepeatType == "MONTHLY"){
+        if(mGoalRepeatType.equals("MONTHLY")){
             // if the repeat type is Monthly, then check if the current month is same as the day of goal creation
             if(CommonUtil.GetCurrentDayOfMonth() == CommonUtil.GetDayOfMonth(goalSetDate)){
                 //If yes, then simply check if the current time is between goal start and end time
@@ -354,7 +354,7 @@ public class Goal  implements Parcelable {
 
         }
 
-        if(mGoalRepeatType == "YEARLY"){
+        if(mGoalRepeatType.equals("YEARLY")){
             //Both Day of Month and Month should be same with that of goal creation
             if(CommonUtil.GetCurrentDayOfMonth() == CommonUtil.GetDayOfMonth(goalSetDate)
                     && CommonUtil.GetCurrentMonth() == CommonUtil.GetMonth(goalSetDate)){
