@@ -300,7 +300,7 @@ public class ContextRecognitionServiceNew extends Service implements SensorEvent
         PendingIntent pendingIntent = PendingIntent.getActivity(this, REQUEST_OPEN, mainIntent, 0);
 
         Notification.Builder notificationBuilder = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.notification_icon_small)
+                .setSmallIcon(R.drawable.notification_target_small)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.target_grey))
                 .setAutoCancel(false)
                 .setContentTitle("GoalTick")
